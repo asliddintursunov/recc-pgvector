@@ -26,7 +26,7 @@ CREATE TABLE "Product" (
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "tags" "PRODUCT_TAG"[],
-    "embedding" vector(1536),
+    "embedding" vector(768),
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );

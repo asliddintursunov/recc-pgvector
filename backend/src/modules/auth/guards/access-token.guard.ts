@@ -3,18 +3,8 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from '@nestjs/core';
 import { AuthService } from './../services/auth.service';
 import { IS_PUBLIC_KEY } from 'src/shared/decorators';
-import { type Request } from 'express';
 import { safeErrorMessage } from 'src/shared/utils';
-
-
-export type AuthRequest = Request & {
-    user: {
-        id: string;
-        username: string;
-        password: string;
-        createdAt: Date;
-    };
-};
+import { AuthRequest } from 'src/shared/types';
 
 
 @Injectable()

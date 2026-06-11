@@ -6,4 +6,8 @@ export class InteractionRepository {
     constructor(
         private readonly prismaService: PrismaService,
     ) { }
+
+    async create() {
+        return true
+    }
 }

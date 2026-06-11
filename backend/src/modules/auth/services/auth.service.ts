@@ -31,7 +31,6 @@ export class AuthService {
 
 
         const isEqual = await Hasher.verify(user.password, password);
-        console.log({ isEqual });
 
         if (!isEqual) throw new UnprocessableEntityException('Username or password is wrong, please try again!');
 

@@ -9,7 +9,7 @@ export class InteractionService {
     ) { }
 
     async create(args: CreateInteractionArgs): Promise<boolean> {
-        const interaction = await this.interactionRepository.create()
+        const interaction = await this.interactionRepository.create(args)
         if (!interaction) {
             return false
         }

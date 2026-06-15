@@ -38,6 +38,11 @@ export class ProductRepository {
         return product ?? null
     }
 
+    async getAll(): Promise<Product[]> {
+        const products = await this.prismService.product.findMany()
+        return products
+    }
+
     async update(id: string, data: UpdateProductArgs): Promise<Product | null> {
         const product = await this.prismService.product.update({
             data,

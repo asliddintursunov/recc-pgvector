@@ -40,6 +40,12 @@ export class ProductService {
         return updatedProduct
     }
 
+    async getAll(): Promise<Product[]> {
+        const products = await this.productRepository.getAll()
+
+        return products
+    }
+
     private buildEmbeddingText(args: CreateProductArgs): string {
         const parts = [
             args.title,

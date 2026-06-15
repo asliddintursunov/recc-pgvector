@@ -34,6 +34,12 @@ enum PRODUCT_TAG {
   electronics
   audio
   wireless
+  laptop
+  smartphone
+  home_appliance
+  furniture
+  fitness
+  books
 }
 
 model Interaction {

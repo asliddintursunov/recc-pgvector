@@ -12,6 +12,22 @@ export class ProductRepository {
         return product ?? null
     }
 
+    async createWithEmbedding(data: CreateProductArgs, embedding: number[]): Promise<Product | null> {
+        const vector = `[${embedding.join(',')}]`;
+
+        return this.prismService.$transaction(async (tx) => {
+            const product = await tx.product.create({ data });
+
+            await tx.$executeRaw`
+                UPDATE "Product"
+                SET "embedding" = ${vector}::vector
+                WHERE "id" = ${product.id}
+            `;
+
+            return product ?? null;
+        });
+    }
+
     async getById(id: string): Promise<Product | null> {
         const product = await this.prismService.product.findFirst({
             where: {

@@ -2,15 +2,20 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { ProductRepository } from "../repositories/product.repository";
 import { CreateProductArgs, UpdateProductArgs } from "../interfaces";
 import { Product } from "@prisma/client";
+import { EmbeddingService } from "src/modules/embedding/services/embedding.service";
 
 @Injectable()
 export class ProductService {
     constructor(
-        private readonly productRepository: ProductRepository
+        private readonly productRepository: ProductRepository,
+        private readonly embeddingService: EmbeddingService,
     ) { }
 
     async create(args: CreateProductArgs): Promise<Product> {
-        const product = await this.productRepository.create(args)
+        const embedding = await this.embeddingService.generateProductEmbedding(
+            this.buildEmbeddingText(args),
+        )
+        const product = await this.productRepository.createWithEmbedding(args, embedding)
 
         if (!product) {
             throw new BadRequestException('Error creating a product!')
@@ -33,6 +38,16 @@ export class ProductService {
         }
 
         return updatedProduct
+    }
+
+    private buildEmbeddingText(args: CreateProductArgs): string {
+        const parts = [
+            args.title,
+            args.description,
+            args.tags?.join(', '),
+        ].filter(Boolean);
+
+        return parts.join('\n');
     }
 
 }

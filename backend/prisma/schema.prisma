@@ -24,7 +24,7 @@ model Product {
   createdAt    DateTime                    @default(now())
   tags         PRODUCT_TAG[]
   interactions Interaction[]
-  embedding    Unsupported("vector(768)")?
+  embedding    Unsupported("vector(1536)")?
 }
 
 enum PRODUCT_TAG {

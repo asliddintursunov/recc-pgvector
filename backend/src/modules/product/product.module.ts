@@ -5,9 +5,10 @@ import { ProductRepository } from "./repositories/product.repository";
 import { PrismaModule } from "../prisma/prisma.module";
 import { InteractionService } from "./services/interaction.service";
 import { InteractionRepository } from "./repositories/interaction.repository";
+import { EmbeddingModule } from "../embedding/embedding.module";
 
 @Module({
-    imports: [PrismaModule],
+    imports: [PrismaModule, EmbeddingModule],
     controllers: [ProductController],
     providers: [ProductService, ProductRepository, InteractionService, InteractionRepository]
 })

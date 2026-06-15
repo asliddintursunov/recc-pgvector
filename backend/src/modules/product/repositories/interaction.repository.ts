@@ -13,7 +13,7 @@ export class InteractionRepository {
             data: {
                 userId: args.userId,
                 productId: args.productId,
-                actionType: args.action,
+                actionType: args.actionType,
             }
         })
 

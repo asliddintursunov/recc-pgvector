@@ -43,6 +43,47 @@ export class ProductRepository {
         return products
     }
 
+    async getRecommended(userId: string): Promise<Product[]> {
+        return await this.prismService.$queryRaw<Product[]>`
+            WITH interacted_products AS (
+                SELECT
+                    p."embedding",
+                    CASE i."actionType"
+                        WHEN 'like' THEN 3.0
+                        WHEN 'click' THEN 2.0
+                        WHEN 'search' THEN 1.0
+                    END AS weight
+                FROM "Interaction" i
+                JOIN "Product" p ON p."id" = i."productId"
+                WHERE i."userId" = ${userId}
+                AND p."embedding" IS NOT NULL
+            )
+            SELECT
+                p."id",
+                p."title",
+                p."description",
+                p."createdAt",
+                p."tags"
+            FROM "Product" p
+            WHERE p."embedding" IS NOT NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM "Interaction" i
+                WHERE i."userId" = ${userId}
+                AND i."productId" = p."id"
+            )
+            ORDER BY COALESCE(
+                (
+                    SELECT MIN((p."embedding" <=> ip."embedding") / ip.weight)
+                    FROM interacted_products ip
+                ),
+                0
+            ) ASC,
+            p."createdAt" DESC
+            LIMIT 10
+        `
+    }
+
     async update(id: string, data: UpdateProductArgs): Promise<Product | null> {
         const product = await this.prismService.product.update({
             data,

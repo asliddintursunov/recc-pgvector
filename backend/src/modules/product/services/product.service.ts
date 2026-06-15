@@ -56,6 +56,10 @@ export class ProductService {
         return product
     }
 
+    async getRecommended(userId: string): Promise<Product[]> {
+        return await this.productRepository.getRecommended(userId)
+    }
+
     private buildEmbeddingText(args: CreateProductArgs): string {
         const parts = [
             args.title,

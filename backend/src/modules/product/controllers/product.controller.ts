@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
 import { ProductService } from "../services/product.service";
 import { Product, type User } from "@prisma/client";
 import { CreateProductDto, UpdateProductDto, UpdateProductParamDto } from "../dtos";
@@ -16,6 +16,11 @@ export class ProductController {
     @Get()
     async getAll(): Promise<Product[]> {
         return await this.productService.getAll();
+    }
+
+    @Get("recommended")
+    async getRecommended(@CurrentUser() user: User): Promise<Product[]> {
+        return await this.productService.getRecommended(user.id)
     }
 
     @Get(":id")
@@ -44,7 +49,7 @@ export class ProductController {
         return this.interactionService.create({
             userId: user.id,
             productId: params.id,
-            action: body.actionType,
+            actionType: body.actionType,
         })
     }
 }

@@ -18,6 +18,12 @@ export class ProductController {
         return await this.productService.getAll();
     }
 
+    @Get(":id")
+    async getById(@Param() params: UpdateProductParamDto): Promise<Product> {
+        const { id } = params
+        return await this.productService.getById(id)
+    }
+
     @Post()
     async create(@Body() body: CreateProductDto): Promise<Product> {
         return await this.productService.create(body)

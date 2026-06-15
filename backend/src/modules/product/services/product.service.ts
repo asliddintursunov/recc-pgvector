@@ -46,6 +46,16 @@ export class ProductService {
         return products
     }
 
+    async getById(id: string): Promise<Product> {
+        const product = await this.productRepository.getById(id)
+
+        if (!product) {
+            throw new NotFoundException('Product not found!')
+        }
+
+        return product
+    }
+
     private buildEmbeddingText(args: CreateProductArgs): string {
         const parts = [
             args.title,

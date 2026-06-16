@@ -6,6 +6,13 @@ import { ENV } from './shared/configs';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: ENV.CORS_ORIGINS,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

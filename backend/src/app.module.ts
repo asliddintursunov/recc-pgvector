@@ -6,10 +6,11 @@ import { ProductModule } from './modules/product/product.module';
 import { UserModule } from './modules/user/user.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './modules/auth/guards/access-token.guard';
+import { PurchaseModule } from './modules/purchase/purchase.module';
 
 
 @Module({
-  imports: [PrismaModule, EmbeddingModule, AuthModule, ProductModule, UserModule],
+  imports: [PrismaModule, EmbeddingModule, AuthModule, ProductModule, UserModule, PurchaseModule],
   providers: [
     {
       provide: APP_GUARD,

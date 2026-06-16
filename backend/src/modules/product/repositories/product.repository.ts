@@ -82,7 +82,8 @@ export class ProductRepository {
                 p."title",
                 p."description",
                 p."createdAt",
-                p."tags"
+                p."tags",
+                p."price"
             FROM "Product" p
             WHERE p."embedding" IS NOT NULL
             AND NOT EXISTS (

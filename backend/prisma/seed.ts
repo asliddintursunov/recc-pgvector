@@ -1,18 +1,9 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
-import { hash } from 'argon2';
 
 const prisma = new PrismaClient();
 
 const PRODUCT_EMBEDDING_DIMENSIONS = 1536;
-
-const users = [
-  { id: '11111111-1111-4111-8111-111111111111', username: 'alice' },
-  { id: '22222222-2222-4222-8222-222222222222', username: 'bekzod' },
-  { id: '33333333-3333-4333-8333-333333333333', username: 'charlie' },
-  { id: '44444444-4444-4444-8444-444444444444', username: 'dilnoza' },
-  { id: '55555555-5555-4555-8555-555555555555', username: 'emily' },
-];
 
 const products = [
   {
@@ -197,52 +188,7 @@ const products = [
   },
 ] as const;
 
-const interactions = [
-  ['11111111-1111-4111-8111-111111111111', '00000000-0000-4000-8000-000000000001', 'like'],
-  ['11111111-1111-4111-8111-111111111111', '00000000-0000-4000-8000-000000000002', 'click'],
-  ['11111111-1111-4111-8111-111111111111', '00000000-0000-4000-8000-000000000023', 'like'],
-  ['11111111-1111-4111-8111-111111111111', '00000000-0000-4000-8000-000000000028', 'search'],
-  ['22222222-2222-4222-8222-222222222222', '00000000-0000-4000-8000-000000000010', 'like'],
-  ['22222222-2222-4222-8222-222222222222', '00000000-0000-4000-8000-000000000011', 'click'],
-  ['22222222-2222-4222-8222-222222222222', '00000000-0000-4000-8000-000000000012', 'like'],
-  ['22222222-2222-4222-8222-222222222222', '00000000-0000-4000-8000-000000000030', 'search'],
-  ['33333333-3333-4333-8333-333333333333', '00000000-0000-4000-8000-000000000007', 'like'],
-  ['33333333-3333-4333-8333-333333333333', '00000000-0000-4000-8000-000000000008', 'click'],
-  ['33333333-3333-4333-8333-333333333333', '00000000-0000-4000-8000-000000000009', 'search'],
-  ['33333333-3333-4333-8333-333333333333', '00000000-0000-4000-8000-000000000027', 'click'],
-  ['44444444-4444-4444-8444-444444444444', '00000000-0000-4000-8000-000000000013', 'like'],
-  ['44444444-4444-4444-8444-444444444444', '00000000-0000-4000-8000-000000000014', 'click'],
-  ['44444444-4444-4444-8444-444444444444', '00000000-0000-4000-8000-000000000016', 'like'],
-  ['44444444-4444-4444-8444-444444444444', '00000000-0000-4000-8000-000000000017', 'search'],
-  ['55555555-5555-4555-8555-555555555555', '00000000-0000-4000-8000-000000000019', 'like'],
-  ['55555555-5555-4555-8555-555555555555', '00000000-0000-4000-8000-000000000020', 'click'],
-  ['55555555-5555-4555-8555-555555555555', '00000000-0000-4000-8000-000000000021', 'like'],
-  ['55555555-5555-4555-8555-555555555555', '00000000-0000-4000-8000-000000000022', 'search'],
-] as const;
-
 async function main() {
-  const password = await hash('password123');
-  const userIds = users.map((user) => user.id);
-  const productIds = products.map((product) => product.id);
-
-  await prisma.interaction.deleteMany({
-    where: {
-      userId: { in: userIds },
-      productId: { in: productIds },
-    },
-  });
-
-  for (const user of users) {
-    await prisma.user.upsert({
-      where: { username: user.username },
-      update: { password },
-      create: {
-        id: user.id,
-        username: user.username,
-        password,
-      },
-    });
-  }
 
   for (const product of products) {
     await prisma.product.upsert({
@@ -263,15 +209,6 @@ async function main() {
     await updateProductEmbedding(product.id, createProductEmbedding(product));
   }
 
-  await prisma.interaction.createMany({
-    data: interactions.map(([userId, productId, actionType]) => ({
-      userId,
-      productId,
-      actionType,
-    })),
-  });
-
-  console.log(`Seeded ${users.length} users, ${products.length} products, and ${interactions.length} interactions.`);
 }
 
 async function updateProductEmbedding(productId: string, embedding: number[]) {

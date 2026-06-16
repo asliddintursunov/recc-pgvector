@@ -47,29 +47,3 @@ export interface ApiError {
   status?: number;
   details?: string[];
 }
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-  unitPrice: number;
-}
-
-export type LocalOrderStatus = "processing" | "confirmed" | "packed" | "delivered";
-
-export interface CheckoutDetails {
-  fullName: string;
-  email: string;
-  address: string;
-}
-
-export interface LocalOrder {
-  id: string;
-  items: CartItem[];
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
-  status: LocalOrderStatus;
-  customer: CheckoutDetails;
-  createdAt: string;
-}

@@ -97,7 +97,6 @@ export default function AuthPage() {
               placeholder="alice"
               disabled={isSubmitting}
               type="text"
-              autoComplete="username"
               required
             />
             <Input
@@ -108,9 +107,6 @@ export default function AuthPage() {
               placeholder="password123"
               disabled={isSubmitting}
               type="password"
-              autoComplete={
-                mode === "login" ? "current-password" : "new-password"
-              }
               minLength={1}
               required
             />

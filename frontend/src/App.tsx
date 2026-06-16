@@ -1,11 +1,11 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Layout } from "./components/ui/Layout";
 import AuthPage from "./pages/Auth";
 import ProductDetailPage from "./pages/Products/Detail";
 import ProductsPage from "./pages/Products";
 import localstorage from "./lib/local-storage.lib";
 import type { ReactElement } from "react";
 import { ROUTES } from "./constants/route.constant";
+import RootLayout from "./layout/RootLayout";
 
 interface ProtectedRouteProps {
   children: ReactElement;
@@ -28,7 +28,7 @@ export function App() {
       <Route
         element={
           <ProtectedRoute>
-            <Layout />
+            <RootLayout />
           </ProtectedRoute>
         }
       >

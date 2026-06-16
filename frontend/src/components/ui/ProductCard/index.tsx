@@ -14,29 +14,6 @@ interface ProductCardProps {
 
 const tagLabel = (tag: string): string => tag.replace("_", " ");
 
-const getPanelClassName = (product: Product): string => {
-  if (product.tags.includes("laptop") || product.tags.includes("electronics")) {
-    return "from-indigo-600 to-sky-500";
-  }
-
-  if (product.tags.includes("audio") || product.tags.includes("wireless")) {
-    return "from-fuchsia-600 to-indigo-500";
-  }
-
-  if (
-    product.tags.includes("furniture") ||
-    product.tags.includes("home_appliance")
-  ) {
-    return "from-emerald-600 to-teal-500";
-  }
-
-  if (product.tags.includes("fitness")) {
-    return "from-rose-600 to-orange-500";
-  }
-
-  return "from-zinc-800 to-zinc-500";
-};
-
 export function ProductCard({
   product,
   compact = false,
@@ -53,12 +30,17 @@ export function ProductCard({
       >
         <div
           className={cn(
-            "relative bg-gradient-to-br",
-            getPanelClassName(product),
+            "relative overflow-hidden bg-zinc-100",
             compact ? "h-28" : "h-40",
           )}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(255,255,255,0.35),transparent_28%),radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.18),transparent_22%)]" />
+          <img
+            src="/images/product.jpg"
+            alt=""
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-zinc-950/20 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
               {product.tags[0] ? tagLabel(product.tags[0]) : "marketplace"}

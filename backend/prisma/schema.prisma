@@ -10,21 +10,24 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  username     String        @unique
-  password     String
-  createdAt    DateTime      @default(now())
-  interactions Interaction[]
+  id                String            @id @default(uuid())
+  username          String            @unique
+  password          String
+  createdAt         DateTime          @default(now())
+  interactions      Interaction[]
+  purchaseHistories PurchaseHistory[]
 }
 
 model Product {
-  id           String                      @id @default(uuid())
-  title        String
-  description  String?
-  createdAt    DateTime                    @default(now())
-  tags         PRODUCT_TAG[]
-  interactions Interaction[]
-  embedding    Unsupported("vector(1536)")?
+  id                String                       @id @default(uuid())
+  title             String
+  description       String?
+  price             Float                        @default(0.0)
+  createdAt         DateTime                     @default(now())
+  tags              PRODUCT_TAG[]
+  interactions      Interaction[]
+  embedding         Unsupported("vector(1536)")?
+  purchaseHistories PurchaseHistory[]
 }
 
 enum PRODUCT_TAG {
@@ -59,4 +62,17 @@ enum INTERACTION_TYPE {
   search
   click
   like
+}
+
+model PurchaseHistory {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  product      Product  @relation(fields: [productId], references: [id])
+  purchaseDate DateTime @default(now())
+  userId       String
+  productId    String
+  quantity     Int
+
+  @@index([userId])
+  @@index([productId])
 }

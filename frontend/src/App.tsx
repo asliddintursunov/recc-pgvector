@@ -1,24 +1,21 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Layout } from "./components/Layout";
-import { AuthPage } from "./pages/AuthPage";
-import { CartPage } from "./pages/CartPage";
-import { CheckoutPage } from "./pages/CheckoutPage";
-import { OrdersPage } from "./pages/OrdersPage";
-import { ProductDetailPage } from "./pages/ProductDetailPage";
-import { ProductsPage } from "./pages/ProductsPage";
-import { useAuthStore } from "./stores/authStore";
+import { Layout } from "./components/ui/Layout";
+import AuthPage from "./pages/Auth";
+import ProductDetailPage from "./pages/Products/Detail";
+import ProductsPage from "./pages/Products";
+import localstorage from "./lib/local-storage.lib";
 import type { ReactElement } from "react";
+import { ROUTES } from "./constants/route.constant";
 
 interface ProtectedRouteProps {
   children: ReactElement;
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const accessToken = useAuthStore((state) => state.accessToken);
   const location = useLocation();
 
-  if (!accessToken) {
-    return <Navigate to="/auth" replace state={{ from: location }} />;
+  if (!localstorage.get("authToken")) {
+    return <Navigate to={ROUTES.AUTH} replace state={{ from: location }} />;
   }
 
   return children;
@@ -27,7 +24,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 export function App() {
   return (
     <Routes>
-      <Route path="/auth" element={<AuthPage />} />
+      <Route path={ROUTES.AUTH} element={<AuthPage />} />
       <Route
         element={
           <ProtectedRoute>
@@ -35,14 +32,11 @@ export function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/products" replace />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:id" element={<ProductDetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route index element={<Navigate to={ROUTES.PRODUCTS} replace />} />
+        <Route path={ROUTES.PRODUCTS} element={<ProductsPage />} />
+        <Route path={ROUTES.PRODUCT_DETAIL} element={<ProductDetailPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/products" replace />} />
+      <Route path="*" element={<Navigate to={ROUTES.PRODUCTS} replace />} />
     </Routes>
   );
 }

@@ -27,14 +27,6 @@ export interface AuthCredentials {
   password: string;
 }
 
-export interface RegisterResponse {
-  message: string;
-}
-
-export interface LoginResponse {
-  accessToken: string;
-}
-
 export interface CreateProductBody {
   title: string;
   description?: string;
@@ -47,12 +39,11 @@ export interface UpdateProductBody {
   tags?: ProductTag[];
 }
 
-export interface CreateInteractionBody {
-  actionType: InteractionType;
-}
-
 export interface ApiError {
   message: string;
+  data: {
+    message: string;
+  }
   status?: number;
   details?: string[];
 }

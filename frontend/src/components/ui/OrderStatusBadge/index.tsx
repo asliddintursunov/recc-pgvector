@@ -1,5 +1,6 @@
 import { CheckCircle2, Clock, PackageCheck, Truck } from "lucide-react";
-import type { LocalOrderStatus } from "../types";
+import { cn } from "../../../lib/cn.lib";
+import type { LocalOrderStatus } from "../../../types";
 
 interface OrderStatusBadgeProps {
   status: LocalOrderStatus;
@@ -37,7 +38,10 @@ export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${config.className}`}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1",
+        config.className,
+      )}
     >
       <Icon className="h-3.5 w-3.5" />
       {config.label}

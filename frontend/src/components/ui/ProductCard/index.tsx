@@ -1,12 +1,11 @@
 import { Heart, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
-import { calculateProductPrice, formatCurrency } from "../lib/pricing";
-import type { Product } from "../types";
+import { cn } from "../../../lib/cn.lib";
+import type { Product } from "../../../types";
 
 interface ProductCardProps {
   product: Product;
   compact?: boolean;
-  onAddToCart: (product: Product) => void;
   onLike: (product: Product) => void;
   onOpen?: (product: Product) => void;
 }
@@ -22,7 +21,10 @@ const getPanelClassName = (product: Product): string => {
     return "from-fuchsia-600 to-indigo-500";
   }
 
-  if (product.tags.includes("furniture") || product.tags.includes("home_appliance")) {
+  if (
+    product.tags.includes("furniture") ||
+    product.tags.includes("home_appliance")
+  ) {
     return "from-emerald-600 to-teal-500";
   }
 
@@ -36,19 +38,22 @@ const getPanelClassName = (product: Product): string => {
 export function ProductCard({
   product,
   compact = false,
-  onAddToCart,
   onLike,
   onOpen,
 }: ProductCardProps) {
-  const price = calculateProductPrice(product);
-
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-soft">
-      <Link to={`/products/${product.id}`} onClick={() => onOpen?.(product)} className="block">
+      <Link
+        to={`/products/${product.id}`}
+        onClick={() => onOpen?.(product)}
+        className="block"
+      >
         <div
-          className={`relative bg-gradient-to-br ${getPanelClassName(product)} ${
-            compact ? "h-28" : "h-40"
-          }`}
+          className={cn(
+            "relative bg-gradient-to-br",
+            getPanelClassName(product),
+            compact ? "h-28" : "h-40",
+          )}
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(255,255,255,0.35),transparent_28%),radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.18),transparent_22%)]" />
           <div className="absolute bottom-4 left-4 right-4">
@@ -76,7 +81,6 @@ export function ProductCard({
           {product.description ?? "No description provided."}
         </p>
         <div className="mt-4 flex items-center justify-between gap-3">
-          <p className="text-lg font-semibold text-zinc-950">{formatCurrency(price)}</p>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -85,14 +89,6 @@ export function ProductCard({
               aria-label={`Like ${product.title}`}
             >
               <Heart className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => onAddToCart(product)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-              aria-label={`Add ${product.title} to cart`}
-            >
-              <ShoppingBag className="h-4 w-4" />
             </button>
           </div>
         </div>

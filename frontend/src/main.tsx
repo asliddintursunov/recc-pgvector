@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { Toast } from "./components/Toast";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
+import { Toaster } from "react-hot-toast";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -31,7 +31,7 @@ ReactDOM.createRoot(rootElement).render(
       <BrowserRouter>
         <ErrorBoundary>
           <App />
-          <Toast />
+          <Toaster position="top-center" reverseOrder={false} />
         </ErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>

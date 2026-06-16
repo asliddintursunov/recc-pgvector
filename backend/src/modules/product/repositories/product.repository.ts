@@ -28,6 +28,25 @@ export class ProductRepository {
         });
     }
 
+    async updateWithEmbedding(id: string, data: UpdateProductArgs, embedding: number[]): Promise<Product | null> {
+        const vector = `[${embedding.join(',')}]`;
+
+        return this.prismService.$transaction(async (tx) => {
+            const product = await tx.product.update({
+                data,
+                where: { id },
+            });
+
+            await tx.$executeRaw`
+                UPDATE "Product"
+                SET "embedding" = ${vector}::vector
+                WHERE "id" = ${product.id}
+            `;
+
+            return product ?? null;
+        });
+    }
+
     async getById(id: string): Promise<Product | null> {
         const product = await this.prismService.product.findFirst({
             where: {

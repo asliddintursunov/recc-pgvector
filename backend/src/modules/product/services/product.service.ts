@@ -1,8 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { ProductRepository } from "../repositories/product.repository";
 import { CreateProductArgs, UpdateProductArgs } from "../interfaces";
-import { Product } from "@prisma/client";
+import { Product, PRODUCT_TAG } from "@prisma/client";
 import { EmbeddingService } from "src/modules/embedding/services/embedding.service";
+
+type ProductEmbeddingSource = {
+    title: string;
+    description?: string | null;
+    tags?: PRODUCT_TAG[];
+}
 
 @Injectable()
 export class ProductService {
@@ -31,7 +37,17 @@ export class ProductService {
             throw new NotFoundException('Product not found!')
         }
 
-        const updatedProduct = await this.productRepository.update(id, args)
+        const embeddingSource = {
+            title: args.title ?? product.title,
+            description: args.description ?? product.description,
+            tags: args.tags ?? product.tags,
+        }
+
+        const embedding = await this.embeddingService.generateProductEmbedding(
+            this.buildEmbeddingText(embeddingSource),
+        )
+
+        const updatedProduct = await this.productRepository.updateWithEmbedding(id, args, embedding)
 
         if (!updatedProduct) {
             throw new Error("Error updating the product")
@@ -60,7 +76,7 @@ export class ProductService {
         return await this.productRepository.getRecommended(userId)
     }
 
-    private buildEmbeddingText(args: CreateProductArgs): string {
+    private buildEmbeddingText(args: ProductEmbeddingSource): string {
         const parts = [
             args.title,
             args.description,

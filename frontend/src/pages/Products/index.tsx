@@ -1,11 +1,27 @@
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
 import { ProductCard } from "../../components/ui/ProductCard";
-import { useCreateInteraction } from "../../hooks/useSubmit";
+import {
+  ProductMenu,
+  type ProductMenuValues,
+} from "../../components/ui/ProductMenu";
+import { Button } from "../../components/ui/Button";
+import {
+  useCreateInteraction,
+  useCreateProduct,
+  useUpdateProduct,
+} from "../../hooks/useSubmit";
 import { useProducts, useRecommendedProducts } from "../../hooks/useGet";
+import type { Product } from "../../types";
 
 export default function ProductsPage() {
+  const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const recommendedQuery = useRecommendedProducts();
   const interactionMutation = useCreateInteraction();
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
   const {
     data: products,
     error: productsError,
@@ -19,6 +35,23 @@ export default function ProductsPage() {
     interactionMutation.mutateAsync({ productId, actionType });
   };
 
+  const handleCreateProduct = async (values: ProductMenuValues) => {
+    await createProductMutation.mutateAsync(values);
+    setCreateMenuOpen(false);
+  };
+
+  const handleUpdateProduct = async (values: ProductMenuValues) => {
+    if (!editingProduct) {
+      return;
+    }
+
+    await updateProductMutation.mutateAsync({
+      id: editingProduct.id,
+      body: values,
+    });
+    setEditingProduct(null);
+  };
+
   if (productsLoading || recommendedQuery.isLoading) {
     return <LoadingSpinner label="Loading marketplace" />;
   }
@@ -29,16 +62,16 @@ export default function ProductsPage() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-indigo-600">
-              Marketplace
+              Recommendation Marketplace System
             </p>
             <h1 className="mt-2 text-2xl font-bold text-zinc-950 sm:text-3xl">
               Products
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
-              Browse seeded products and train recommendations with likes,
-              searches, and product views.
-            </p>
           </div>
+          <Button onClick={() => setCreateMenuOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Create product
+          </Button>
         </div>
       </section>
 
@@ -49,9 +82,6 @@ export default function ProductsPage() {
               <h2 className="text-lg font-semibold text-zinc-950">
                 Recommended for you
               </h2>
-              <p className="text-sm text-zinc-500">
-                Updated from your interaction history.
-              </p>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,6 +92,7 @@ export default function ProductsPage() {
                 compact
                 onLike={(product) => handleInteraction(product.id, "like")}
                 onOpen={(product) => handleInteraction(product.id, "click")}
+                onEdit={setEditingProduct}
               />
             ))}
           </div>
@@ -90,10 +121,24 @@ export default function ProductsPage() {
               product={product}
               onLike={(product) => handleInteraction(product.id, "like")}
               onOpen={(product) => handleInteraction(product.id, "click")}
+              onEdit={setEditingProduct}
             />
           ))}
         </div>
       </section>
+      <ProductMenu
+        open={createMenuOpen}
+        isSubmitting={createProductMutation.isPending}
+        onClose={() => setCreateMenuOpen(false)}
+        onSubmit={handleCreateProduct}
+      />
+      <ProductMenu
+        open={Boolean(editingProduct)}
+        product={editingProduct}
+        isSubmitting={updateProductMutation.isPending}
+        onClose={() => setEditingProduct(null)}
+        onSubmit={handleUpdateProduct}
+      />
     </div>
   );
 }

@@ -31,7 +31,9 @@ export default function Layout() {
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
               <ShoppingBag className="h-5 w-5" />
             </span>
-            <span className="text-lg font-bold text-zinc-950">RecoMart</span>
+            <span className="text-lg font-bold text-zinc-950">
+              Recommendation System
+            </span>
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
             <NavLink to={ROUTES.PRODUCTS} className={navLinkClass}>
@@ -39,10 +41,6 @@ export default function Layout() {
             </NavLink>
           </nav>
           <div className="flex items-center gap-2">
-            <Button>
-              <ShoppingCart className="h-4 w-4" />
-              Cart
-            </Button>
             <Button variant="ghost" onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
               Sign out

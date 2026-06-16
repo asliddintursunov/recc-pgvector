@@ -7,6 +7,7 @@ export const API_ENDPOINTS = {
         ALL: "/products",
         RECOMMENDED: "/products/recommended",
         DETAIL: (id: string) => `/products/${id}`,
-        INTERACT: (id: string) => `/products/${id}/interactions`,
+        UPDATE: (id: string) => `/products/${id}`,
+        INTERACT: (id: string) => `/products/${id}/interaction`,
     },
 };

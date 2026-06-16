@@ -1,6 +1,13 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import { ApiError, AuthCredentials, InteractionType } from "../types";
+import {
+    ApiError,
+    AuthCredentials,
+    CreateProductBody,
+    InteractionType,
+    Product,
+    UpdateProductBody,
+} from "../types";
 import { apiClient } from "../lib";
 import { API_ENDPOINTS } from "../constants/api-endpoint.constant";
 import localstorage from "../lib/local-storage.lib";
@@ -35,8 +42,39 @@ export const useRegisterMutation = () => {
     })
 }
 
-export const useCreateProduct = () => { };
-export const useUpdateProduct = () => { };
+export const useCreateProduct = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<Product, ApiError, CreateProductBody>({
+        mutationFn: (body) => apiClient.post<Product>(API_ENDPOINTS.PRODUCTS.ALL, body),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["products"] });
+            toast.success("Product created");
+        },
+        onError: (error) => {
+            toast.error(error.data.message);
+        }
+    })
+};
+
+export const useUpdateProduct = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<Product, ApiError, { id: string; body: UpdateProductBody }>({
+        mutationFn: ({ id, body }) =>
+            apiClient.patch<Product>(API_ENDPOINTS.PRODUCTS.UPDATE(id), body),
+        onSuccess: async (product) => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ["products"] }),
+                queryClient.invalidateQueries({ queryKey: ["products", "detail", product.id] }),
+            ]);
+            toast.success("Product updated");
+        },
+        onError: (error) => {
+            toast.error(error.data.message);
+        }
+    })
+};
 
 export const useCreateInteraction = () => {
     return useMutation<void, ApiError, { productId: string; actionType: InteractionType }>({

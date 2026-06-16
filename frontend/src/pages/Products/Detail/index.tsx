@@ -1,13 +1,23 @@
-import { ArrowLeft, Heart, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Heart, Pencil } from "lucide-react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { LoadingSpinner } from "../../../components/ui/LoadingSpinner";
-import { useCreateInteraction, useProductDetails } from "../../../hooks";
+import {
+  useCreateInteraction,
+  useProductDetails,
+  useUpdateProduct,
+} from "../../../hooks";
 import { Button } from "../../../components/ui/Button";
 import { ROUTES } from "../../../constants/route.constant";
+import {
+  ProductMenu,
+  type ProductMenuValues,
+} from "../../../components/ui/ProductMenu";
 
 const tagLabel = (tag: string): string => tag.replace("_", " ");
 
 export default function ProductDetailPage() {
+  const [editMenuOpen, setEditMenuOpen] = useState(false);
   const { id } = useParams<{ id: string }>();
   const {
     data: product,
@@ -15,6 +25,7 @@ export default function ProductDetailPage() {
     isLoading: productLoading,
   } = useProductDetails(id ?? "");
   const interactionMutation = useCreateInteraction();
+  const updateProductMutation = useUpdateProduct();
 
   if (productLoading) {
     return <LoadingSpinner label="Loading product" />;
@@ -33,6 +44,14 @@ export default function ProductDetailPage() {
       productId: product.id,
       actionType: "like",
     });
+  };
+
+  const handleUpdateProduct = async (values: ProductMenuValues) => {
+    await updateProductMutation.mutateAsync({
+      id: product.id,
+      body: values,
+    });
+    setEditMenuOpen(false);
   };
 
   return (
@@ -83,6 +102,15 @@ export default function ProductDetailPage() {
           <div className="mt-6 grid gap-3">
             <Button
               type="button"
+              onClick={() => setEditMenuOpen(true)}
+              disabled={updateProductMutation.isPending}
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit product
+            </Button>
+            <Button
+              type="button"
               onClick={handleLike}
               disabled={interactionMutation.isPending}
               className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
@@ -92,6 +120,13 @@ export default function ProductDetailPage() {
           </div>
         </aside>
       </section>
+      <ProductMenu
+        open={editMenuOpen}
+        product={product}
+        isSubmitting={updateProductMutation.isPending}
+        onClose={() => setEditMenuOpen(false)}
+        onSubmit={handleUpdateProduct}
+      />
     </div>
   );
 }

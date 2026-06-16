@@ -1,13 +1,15 @@
-import { Heart } from "lucide-react";
+import { Heart, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "../../../lib/cn.lib";
 import type { Product } from "../../../types";
+import { ROUTES } from "../../../constants/route.constant";
 
 interface ProductCardProps {
   product: Product;
   compact?: boolean;
   onLike: (product: Product) => void;
   onOpen?: (product: Product) => void;
+  onEdit?: (product: Product) => void;
 }
 
 const tagLabel = (tag: string): string => tag.replace("_", " ");
@@ -40,12 +42,13 @@ export function ProductCard({
   compact = false,
   onLike,
   onOpen,
+  onEdit,
 }: ProductCardProps) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-soft">
       <Link
-        to={`/products/${product.id}`}
-        onClick={() => onOpen?.(product)}
+        to={ROUTES.PRODUCT_DETAIL.replace(":id", product.id)}
+        onClick={() => (onEdit ? null : onOpen?.(product))}
         className="block"
       >
         <div
@@ -90,6 +93,16 @@ export function ProductCard({
             >
               <Heart className="h-4 w-4" />
             </button>
+            {onEdit ? (
+              <button
+                type="button"
+                onClick={() => onEdit(product)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-zinc-200 text-zinc-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                aria-label={`Edit ${product.title}`}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

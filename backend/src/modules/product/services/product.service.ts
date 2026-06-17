@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { ProductRepository } from "../repositories/product.repository";
 import { CreateProductArgs, UpdateProductArgs } from "../interfaces";
 import { Product, PRODUCT_TAG } from "@prisma/client";
@@ -21,7 +21,7 @@ export class ProductService {
         const embedding = await this.embeddingService.generateProductEmbedding(
             this.buildEmbeddingText(args),
         )
-        const product = await this.productRepository.createWithEmbedding(args, embedding)
+        const product = await this.productRepository.create(args, embedding)
 
         if (!product) {
             throw new BadRequestException('Error creating a product!')
@@ -30,11 +30,15 @@ export class ProductService {
         return product
     }
 
-    async update(id: string, args: UpdateProductArgs): Promise<Product> {
-        const product = await this.productRepository.getById(id)
+    async update(args: UpdateProductArgs): Promise<Product> {
+        const product = await this.productRepository.getById(args.id)
 
         if (!product) {
             throw new NotFoundException('Product not found!')
+        }
+
+        if (product.creatorId !== args.userId) {
+            throw new ForbiddenException('Only product creator or admin can update the product!')
         }
 
         const embeddingSource = {
@@ -47,7 +51,7 @@ export class ProductService {
             this.buildEmbeddingText(embeddingSource),
         )
 
-        const updatedProduct = await this.productRepository.updateWithEmbedding(id, args, embedding)
+        const updatedProduct = await this.productRepository.updateWithEmbedding(args.id, args, embedding)
 
         if (!updatedProduct) {
             throw new Error("Error updating the product")

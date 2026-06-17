@@ -7,16 +7,16 @@ import { Product } from "@prisma/client";
 export class ProductRepository {
     constructor(private readonly prismService: PrismaService) { }
 
-    async create(data: CreateProductArgs): Promise<Product | null> {
-        const product = await this.prismService.product.create({ data })
-        return product ?? null
-    }
-
-    async createWithEmbedding(data: CreateProductArgs, embedding: number[]): Promise<Product | null> {
+    async create(data: CreateProductArgs, embedding: number[]): Promise<Product | null> {
         const vector = `[${embedding.join(',')}]`;
 
         return this.prismService.$transaction(async (tx) => {
-            const product = await tx.product.create({ data });
+            const product = await tx.product.create({
+                data: {
+                    creatorId: data.userId,
+                    ...data,
+                }
+            });
 
             await tx.$executeRaw`
                 UPDATE "Product"
@@ -50,7 +50,8 @@ export class ProductRepository {
     async getById(id: string): Promise<Product | null> {
         const product = await this.prismService.product.findFirst({
             where: {
-                id
+                id,
+                isDeleted: false,
             }
         })
 
@@ -58,7 +59,11 @@ export class ProductRepository {
     }
 
     async getAll(): Promise<Product[]> {
-        const products = await this.prismService.product.findMany()
+        const products = await this.prismService.product.findMany({
+            where: {
+                isDeleted: false,
+            }
+        })
         return products
     }
 
@@ -76,6 +81,7 @@ export class ProductRepository {
                 JOIN "Product" p ON p."id" = i."productId"
                 WHERE i."userId" = ${userId}
                 AND p."embedding" IS NOT NULL
+                AND p."isDeleted" = false
             )
             SELECT
                 p."id",
@@ -86,6 +92,7 @@ export class ProductRepository {
                 p."price"
             FROM "Product" p
             WHERE p."embedding" IS NOT NULL
+            AND p."isDeleted" = false
             AND NOT EXISTS (
                 SELECT 1
                 FROM "Interaction" i

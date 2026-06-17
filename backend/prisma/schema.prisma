@@ -17,6 +17,7 @@ model User {
   role              USER_ROLE         @default(customer)
   interactions      Interaction[]
   purchaseHistories PurchaseHistory[]
+  products          Product[]
 }
 
 enum USER_ROLE {
@@ -31,10 +32,13 @@ model Product {
   description       String?
   price             Float                        @default(0.0)
   createdAt         DateTime                     @default(now())
+  creatorId         String
+  isDeleted         Boolean                      @default(false)
   tags              PRODUCT_TAG[]
   interactions      Interaction[]
   embedding         Unsupported("vector(1536)")?
   purchaseHistories PurchaseHistory[]
+  creator           User                         @relation(fields: [creatorId], references: [id])
 }
 
 enum PRODUCT_TAG {

@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { ProductRepository } from "../repositories/product.repository";
 import { CreateProductArgs, UpdateProductArgs } from "../interfaces";
-import { Product, PRODUCT_TAG } from "@prisma/client";
+import { Product, PRODUCT_TAG, USER_ROLE } from "@prisma/client";
 import { EmbeddingService } from "src/modules/embedding/services/embedding.service";
 
 type ProductEmbeddingSource = {
@@ -31,7 +31,7 @@ export class ProductService {
     }
 
     async update(args: UpdateProductArgs): Promise<Product> {
-        const product = await this.productRepository.getById(args.id)
+        const product = await this.productRepository.getById(args.userId, args.userRole, args.id)
 
         if (!product) {
             throw new NotFoundException('Product not found!')
@@ -51,7 +51,7 @@ export class ProductService {
             this.buildEmbeddingText(embeddingSource),
         )
 
-        const updatedProduct = await this.productRepository.updateWithEmbedding(args.id, args, embedding)
+        const updatedProduct = await this.productRepository.update(args.id, args, embedding)
 
         if (!updatedProduct) {
             throw new Error("Error updating the product")
@@ -60,14 +60,14 @@ export class ProductService {
         return updatedProduct
     }
 
-    async getAll(): Promise<Product[]> {
-        const products = await this.productRepository.getAll()
+    async getAll(userId: string, userRole: USER_ROLE): Promise<Product[]> {
+        const products = await this.productRepository.getAll(userId, userRole)
 
         return products
     }
 
-    async getById(id: string): Promise<Product> {
-        const product = await this.productRepository.getById(id)
+    async getById(userId: string, userRole: USER_ROLE, id: string): Promise<Product> {
+        const product = await this.productRepository.getById(userId, userRole, id)
 
         if (!product) {
             throw new NotFoundException('Product not found!')
@@ -76,8 +76,8 @@ export class ProductService {
         return product
     }
 
-    async getRecommended(userId: string): Promise<Product[]> {
-        return await this.productRepository.getRecommended(userId)
+    async getRecommended(userId: string, userRole: USER_ROLE): Promise<Product[]> {
+        return await this.productRepository.getRecommended(userId, userRole)
     }
 
     private buildEmbeddingText(args: ProductEmbeddingSource): string {

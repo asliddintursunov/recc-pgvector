@@ -15,19 +15,24 @@ export class ProductController {
     ) { }
 
     @Get()
-    async getAll(): Promise<Product[]> {
-        return await this.productService.getAll();
+    async getAll(
+        @CurrentUser() user: User
+    ): Promise<Product[]> {
+        return await this.productService.getAll(user.id, user.role);
     }
 
     @Get("recommended")
     async getRecommended(@CurrentUser() user: User): Promise<Product[]> {
-        return await this.productService.getRecommended(user.id)
+        return await this.productService.getRecommended(user.id, user.role)
     }
 
     @Get(":id")
-    async getById(@Param() params: UpdateProductParamDto): Promise<Product> {
+    async getById(
+        @CurrentUser() user: User,
+        @Param() params: UpdateProductParamDto
+    ): Promise<Product> {
         const { id } = params
-        return await this.productService.getById(id)
+        return await this.productService.getById(user.id, user.role, id);
     }
 
     @Post()
@@ -36,6 +41,7 @@ export class ProductController {
     async create(@CurrentUser() user: User, @Body() body: CreateProductDto): Promise<Product> {
         return await this.productService.create({
             userId: user.id,
+            userRole: user.role,
             ...body,
         })
     }
@@ -51,6 +57,7 @@ export class ProductController {
         const { id } = params
         return await this.productService.update({
             userId: user.id,
+            userRole: user.role,
             id,
             ...body
         })

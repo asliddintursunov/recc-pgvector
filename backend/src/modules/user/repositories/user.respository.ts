@@ -6,11 +6,11 @@ import { CreateMerchantArgs } from "../interfaces";
 @Injectable()
 export class UserRepository {
     constructor(
-        private readonly prismService: PrismaService
+        private readonly prismaService: PrismaService
     ) { }
 
     async getById(id: string): Promise<User | null> {
-        const user = await this.prismService.user.findFirst({
+        const user = await this.prismaService.user.findFirst({
             where: { id }
         })
 
@@ -18,7 +18,7 @@ export class UserRepository {
     }
 
     async switchToMerchant(args: CreateMerchantArgs): Promise<User> {
-        return this.prismService.$transaction(async (tx) => {
+        return this.prismaService.$transaction(async (tx) => {
             await tx.merchant.upsert({
                 where: { userId: args.userId },
                 update: {},
@@ -33,7 +33,7 @@ export class UserRepository {
     }
 
     async switchToCustomer(userId: string): Promise<User> {
-        return this.prismService.user.update({
+        return this.prismaService.user.update({
             where: { id: userId },
             data: { role: USER_ROLE.customer },
         });

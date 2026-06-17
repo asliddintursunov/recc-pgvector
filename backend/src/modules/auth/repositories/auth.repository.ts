@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/modules/prisma/services/prisma.service';
+import { AuthInterfaceArgs } from '../interfaces';
 
 @Injectable()
 export class AuthRepository {
-    constructor(private readonly prismService: PrismaService) { }
+    constructor(private readonly prismaService: PrismaService) { }
 
     async getByUsername(username: string): Promise<User | null> {
-        return await this.prismService.user.findFirst({ where: { username } })
+        return await this.prismaService.user.findFirst({ where: { username } })
     }
 
-    async create(username: string, password: string): Promise<User | null> {
-        return await this.prismService.user.create({ data: { username, password } })
+    async create(data: AuthInterfaceArgs): Promise<User | null> {
+        return await this.prismaService.user.create({ data })
     }
 }

@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { ProductRepository } from "../repositories/product.repository";
-import { CreateProductArgs, GetProductByIdInterfaceArgs, GetProductInterfaceArgs, UpdateProductArgs } from "../interfaces";
+import { CreateProductArgs, GetProductByIdArgs, GetProductArgs, UpdateProductArgs } from "../interfaces";
 import { Product, PRODUCT_TAG, USER_ROLE } from "@prisma/client";
 import { EmbeddingService } from "src/modules/embedding/services/embedding.service";
 
@@ -66,13 +66,13 @@ export class ProductService {
         return updatedProduct
     }
 
-    async getAll(args: GetProductInterfaceArgs): Promise<Product[]> {
+    async getAll(args: GetProductArgs): Promise<Product[]> {
         const products = await this.productRepository.getAll(args)
 
         return products
     }
 
-    async getById(args: GetProductByIdInterfaceArgs): Promise<Product> {
+    async getById(args: GetProductByIdArgs): Promise<Product> {
         const product = await this.productRepository.getById(args)
 
         if (!product) {
@@ -82,7 +82,7 @@ export class ProductService {
         return product
     }
 
-    async getRecommended(args: GetProductInterfaceArgs): Promise<Product[]> {
+    async getRecommended(args: GetProductArgs): Promise<Product[]> {
         return await this.productRepository.getRecommended(args)
     }
 

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/services/prisma.service";
-import { CreateProductArgs, CreateProductWithEmbeddingArgs, GetProductByIdInterfaceArgs, GetProductInterfaceArgs, UpdateProductWithEmbeddingArgs } from "../interfaces";
+import { CreateProductArgs, CreateProductWithEmbeddingArgs, GetProductByIdArgs, GetProductArgs, UpdateProductWithEmbeddingArgs } from "../interfaces";
 import { Product, USER_ROLE } from "@prisma/client";
 
 type ProductWithCreator = Product & {
@@ -63,7 +63,7 @@ export class ProductRepository {
         });
     }
 
-    async getById(args: GetProductByIdInterfaceArgs): Promise<Product | null> {
+    async getById(args: GetProductByIdArgs): Promise<Product | null> {
         const { userId, userRole, id } = args
         return await this.prismaService.product.findFirst({
             where: {
@@ -91,7 +91,7 @@ export class ProductRepository {
     }
 
 
-    async getAll(args: GetProductInterfaceArgs): Promise<Product[]> {
+    async getAll(args: GetProductArgs): Promise<Product[]> {
         const { userId, userRole } = args
         return await this.prismaService.product.findMany({
             where: {
@@ -102,7 +102,7 @@ export class ProductRepository {
     }
 
 
-    async getRecommended(args: GetProductInterfaceArgs): Promise<Product[]> {
+    async getRecommended(args: GetProductArgs): Promise<Product[]> {
         const { userId, userRole } = args;
         const isMerchant = userRole === 'merchant';
 

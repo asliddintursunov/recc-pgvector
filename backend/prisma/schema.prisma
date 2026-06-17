@@ -14,8 +14,15 @@ model User {
   username          String            @unique
   password          String
   createdAt         DateTime          @default(now())
+  role              USER_ROLE         @default(customer)
   interactions      Interaction[]
   purchaseHistories PurchaseHistory[]
+}
+
+enum USER_ROLE {
+  admin
+  merchant
+  customer
 }
 
 model Product {

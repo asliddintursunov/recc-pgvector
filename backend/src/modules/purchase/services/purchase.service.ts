@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PurchaseRepository } from "../repositories/purchase.repository";
-import { CreatePurchaseArgs } from "../interfaces";
+import { CreatePurchaseArgs, CreatePurchaseNormalizedArgs } from "../interfaces";
 
 @Injectable()
 export class PurchaseService {
@@ -14,15 +14,15 @@ export class PurchaseService {
         return this.purchaseRepository.getDetails(purchaseId);
     }
 
-    async create(args: { userId: string; data: Omit<CreatePurchaseArgs, "userId">[] }) {
-        const createData: CreatePurchaseArgs[] = args.data.map((e) => {
-            return {
-                userId: args.userId,
-                productId: e.productId,
-                quantity: e.quantity
-            }
-        })
-        const result = await this.purchaseRepository.create(createData)
-        return result;
+    async create(args: CreatePurchaseArgs) {
+        const { userId, products } = args;
+
+        const data: CreatePurchaseNormalizedArgs[] = products.map(product => ({
+            userId,
+            productId: product.productId,
+            quantity: product.quantity,
+        }))
+
+        return await this.purchaseRepository.create(data)
     }
 }

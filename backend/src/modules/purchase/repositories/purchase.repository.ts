@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/services/prisma.service";
-import { GetPurchaseHistoryResponseDto } from "../dtos";
-import { CreatePurchaseArgs } from "../interfaces";
+import { CreatePurchaseArgs, CreatePurchaseNormalizedArgs } from "../interfaces";
 
 @Injectable()
 export class PurchaseRepository {
@@ -49,7 +48,7 @@ export class PurchaseRepository {
         })
     }
 
-    async create(data: CreatePurchaseArgs[]) {
+    async create(data: CreatePurchaseNormalizedArgs[]) {
         const history = await this.prismaService.purchaseHistory.createMany({
             data
         })

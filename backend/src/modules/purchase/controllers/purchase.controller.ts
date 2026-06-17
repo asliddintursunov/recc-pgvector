@@ -2,19 +2,20 @@ import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { PurchaseService } from "../services/purchase.service";
 import { CurrentUser } from "src/shared/decorators/current-user.decorator";
 import { type User } from "@prisma/client";
-import { CreatePurchaseDto, GetPurchaseHistoryResponseDto } from "../dtos";
+import { CreatePurchaseDto } from "../dtos";
+import { CreatePurchaseResponse, GetPurchaseHistoryResponse } from "../interfaces";
 
 @Controller('purchase')
 export class PurchaseController {
     constructor(private readonly purchaseService: PurchaseService) { }
 
     @Get('history')
-    async getAll(@CurrentUser() user: User): Promise<GetPurchaseHistoryResponseDto[]> {
+    async getAll(@CurrentUser() user: User): Promise<GetPurchaseHistoryResponse[]> {
         return this.purchaseService.getAll(user.id);
     }
 
     @Get(':id')
-    async getDetails(@Param('id') purchaseId: string): Promise<GetPurchaseHistoryResponseDto | null> {
+    async getDetails(@Param('id') purchaseId: string): Promise<GetPurchaseHistoryResponse | null> {
         return this.purchaseService.getDetails(purchaseId);
     }
 
@@ -22,11 +23,11 @@ export class PurchaseController {
     async create(
         @CurrentUser() user: User,
         @Body() data: CreatePurchaseDto[]
-    ): Promise<{ message: string }> {
+    ): Promise<CreatePurchaseResponse> {
 
         await this.purchaseService.create({
             userId: user.id,
-            data
+            products: data
         });
 
         return { message: "Products have been purchased successfully!" }

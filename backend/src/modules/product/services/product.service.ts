@@ -31,13 +31,13 @@ export class ProductService {
     }
 
     async update(args: UpdateProductArgs): Promise<Product> {
-        const product = await this.productRepository.getById(args.userId, args.userRole, args.id)
+        const product = await this.productRepository.getByIdForUpdate(args.id)
 
         if (!product) {
             throw new NotFoundException('Product not found!')
         }
 
-        if (product.creatorId !== args.userId) {
+        if (args.userRole !== USER_ROLE.admin && product.creator.userId !== args.userId) {
             throw new ForbiddenException('Only product creator or admin can update the product!')
         }
 

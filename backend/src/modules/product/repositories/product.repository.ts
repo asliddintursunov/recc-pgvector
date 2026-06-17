@@ -3,18 +3,31 @@ import { PrismaService } from "src/modules/prisma/services/prisma.service";
 import { CreateProductArgs, UpdateProductArgs } from "../interfaces";
 import { Product, USER_ROLE } from "@prisma/client";
 
+type ProductWithCreator = Product & {
+    creator: {
+        userId: string;
+    };
+};
+
 @Injectable()
 export class ProductRepository {
     constructor(private readonly prismaService: PrismaService) { }
 
     async create(data: CreateProductArgs, embedding: number[]): Promise<Product | null> {
         const vector = `[${embedding.join(',')}]`;
+        const { userId, userRole: _userRole, ...productData } = data;
 
         return this.prismaService.$transaction(async (tx) => {
+            const merchant = await tx.merchant.upsert({
+                where: { userId },
+                update: {},
+                create: { userId },
+            });
+
             const product = await tx.product.create({
                 data: {
-                    creatorId: data.userId,
-                    ...data,
+                    ...productData,
+                    creatorId: merchant.id,
                 }
             });
 
@@ -30,10 +43,11 @@ export class ProductRepository {
 
     async update(id: string, data: UpdateProductArgs, embedding: number[]): Promise<Product | null> {
         const vector = `[${embedding.join(',')}]`;
+        const { userId: _userId, userRole: _userRole, id: _id, ...productData } = data;
 
         return this.prismaService.$transaction(async (tx) => {
             const product = await tx.product.update({
-                data,
+                data: productData,
                 where: { id },
             });
 
@@ -52,7 +66,23 @@ export class ProductRepository {
             where: {
                 id,
                 isDeleted: false,
-                ...(userRole === 'merchant' && { creatorId: { not: userId } })
+                ...(userRole === 'merchant' && { creator: { userId: { not: userId } } })
+            }
+        }) ?? null;
+    }
+
+    async getByIdForUpdate(id: string): Promise<ProductWithCreator | null> {
+        return await this.prismaService.product.findFirst({
+            where: {
+                id,
+                isDeleted: false,
+            },
+            include: {
+                creator: {
+                    select: {
+                        userId: true,
+                    }
+                }
             }
         }) ?? null;
     }
@@ -62,7 +92,7 @@ export class ProductRepository {
         return await this.prismaService.product.findMany({
             where: {
                 isDeleted: false,
-                ...(userRole === 'merchant' && { creatorId: { not: userId } })
+                ...(userRole === 'merchant' && { creator: { userId: { not: userId } } })
             }
         });
     }
@@ -94,9 +124,10 @@ export class ProductRepository {
             p."tags",
             p."price"
         FROM "Product" p
+        JOIN "Merchant" m ON m."id" = p."creatorId"
         WHERE p."embedding" IS NOT NULL
         AND p."isDeleted" = false
-        AND (${isMerchant} = false OR p."creatorId" != ${userId})
+        AND (${isMerchant} = false OR m."userId" != ${userId})
         AND NOT EXISTS (
             SELECT 1
             FROM "Interaction" i

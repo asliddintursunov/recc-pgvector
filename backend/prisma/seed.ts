@@ -240,6 +240,11 @@ async function main() {
       role: ADMIN_USER.role,
     },
   });
+  const adminMerchant = await prisma.merchant.upsert({
+    where: { userId: admin.id },
+    update: {},
+    create: { userId: admin.id },
+  });
 
   for (const product of products) {
     await prisma.product.upsert({
@@ -249,7 +254,7 @@ async function main() {
         description: product.description,
         price: product.price,
         tags: [...product.tags],
-        creatorId: admin.id,
+        creatorId: adminMerchant.id,
         isDeleted: false,
       },
       create: {
@@ -258,7 +263,7 @@ async function main() {
         description: product.description,
         price: product.price,
         tags: [...product.tags],
-        creatorId: admin.id,
+        creatorId: adminMerchant.id,
         isDeleted: false,
       },
     });

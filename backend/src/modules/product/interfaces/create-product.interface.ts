@@ -7,3 +7,7 @@ export interface CreateProductArgs {
     userRole: USER_ROLE;
     tags?: PRODUCT_TAG[]
 }
+
+export interface CreateProductWithEmbeddingArgs extends CreateProductArgs {
+    embedding: number[];
+}

@@ -18,12 +18,18 @@ export class ProductController {
     async getAll(
         @CurrentUser() user: User
     ): Promise<Product[]> {
-        return await this.productService.getAll(user.id, user.role);
+        return await this.productService.getAll({
+            userId: user.id,
+            userRole: user.role,
+        });
     }
 
     @Get("recommended")
     async getRecommended(@CurrentUser() user: User): Promise<Product[]> {
-        return await this.productService.getRecommended(user.id, user.role)
+        return await this.productService.getRecommended({
+            userId: user.id,
+            userRole: user.role,
+        })
     }
 
     @Get(":id")
@@ -32,7 +38,11 @@ export class ProductController {
         @Param() params: UpdateProductParamDto
     ): Promise<Product> {
         const { id } = params
-        return await this.productService.getById(user.id, user.role, id);
+        return await this.productService.getById({
+            userId: user.id,
+            userRole: user.role,
+            id,
+        });
     }
 
     @Post()

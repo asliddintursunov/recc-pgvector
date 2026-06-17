@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/services/prisma.service";
-import { CreateProductArgs, UpdateProductArgs } from "../interfaces";
+import { CreateProductArgs, CreateProductWithEmbeddingArgs, GetProductByIdInterfaceArgs, GetProductInterfaceArgs, UpdateProductWithEmbeddingArgs } from "../interfaces";
 import { Product, USER_ROLE } from "@prisma/client";
 
 type ProductWithCreator = Product & {
@@ -13,7 +13,8 @@ type ProductWithCreator = Product & {
 export class ProductRepository {
     constructor(private readonly prismaService: PrismaService) { }
 
-    async create(data: CreateProductArgs, embedding: number[]): Promise<Product | null> {
+    async create(args: CreateProductWithEmbeddingArgs): Promise<Product | null> {
+        const { embedding, ...data } = args;
         const vector = `[${embedding.join(',')}]`;
         const { userId, userRole: _userRole, ...productData } = data;
 
@@ -41,9 +42,10 @@ export class ProductRepository {
         });
     }
 
-    async update(id: string, data: UpdateProductArgs, embedding: number[]): Promise<Product | null> {
+    async update(args: UpdateProductWithEmbeddingArgs): Promise<Product | null> {
+        const { embedding, id, ...data } = args;
         const vector = `[${embedding.join(',')}]`;
-        const { userId: _userId, userRole: _userRole, id: _id, ...productData } = data;
+        const { userId: _userId, userRole: _userRole, ...productData } = data;
 
         return this.prismaService.$transaction(async (tx) => {
             const product = await tx.product.update({
@@ -61,7 +63,8 @@ export class ProductRepository {
         });
     }
 
-    async getById(userId: string, userRole: USER_ROLE, id: string): Promise<Product | null> {
+    async getById(args: GetProductByIdInterfaceArgs): Promise<Product | null> {
+        const { userId, userRole, id } = args
         return await this.prismaService.product.findFirst({
             where: {
                 id,
@@ -88,7 +91,8 @@ export class ProductRepository {
     }
 
 
-    async getAll(userId: string, userRole: USER_ROLE): Promise<Product[]> {
+    async getAll(args: GetProductInterfaceArgs): Promise<Product[]> {
+        const { userId, userRole } = args
         return await this.prismaService.product.findMany({
             where: {
                 isDeleted: false,
@@ -98,7 +102,8 @@ export class ProductRepository {
     }
 
 
-    async getRecommended(userId: string, userRole: USER_ROLE): Promise<Product[]> {
+    async getRecommended(args: GetProductInterfaceArgs): Promise<Product[]> {
+        const { userId, userRole } = args;
         const isMerchant = userRole === 'merchant';
 
         return await this.prismaService.$queryRaw<Product[]>`

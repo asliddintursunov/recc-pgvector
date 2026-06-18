@@ -6,6 +6,7 @@ import type {
     CreateProductBody,
     InteractionType,
     Product,
+    RegisterCredentials,
     UpdateProductBody,
 } from "../types";
 import { apiClient } from "../lib";
@@ -28,11 +29,18 @@ export const useLoginMutation = () => {
 }
 
 export const useRegisterMutation = () => {
-    return useMutation<{ message: string }, ApiError, AuthCredentials>({
+    return useMutation<{ message: string }, ApiError, RegisterCredentials>({
         mutationFn: (credentials) =>
-            apiClient.post<{ message: string }>(API_ENDPOINTS.AUTH.REGISTER, credentials, {
-                skipAuth: true,
-            }),
+            apiClient.post<{ message: string }>(
+                API_ENDPOINTS.AUTH.REGISTER(credentials.role),
+                {
+                    username: credentials.username,
+                    password: credentials.password,
+                },
+                {
+                    skipAuth: true,
+                },
+            ),
         onSuccess: (data) => {
             toast.success(data.message);
         },

@@ -86,13 +86,13 @@ enum INTERACTION_TYPE {
 }
 
 model PurchaseHistory {
-  id           String   @id @default(uuid())
-  user         User     @relation(fields: [userId], references: [id])
-  product      Product  @relation(fields: [productId], references: [id])
-  purchaseDate DateTime @default(now())
-  userId       String
-  productId    String
-  quantity     Int
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  userId    String
+  productId String
+  quantity  Int
 
   @@index([userId])
   @@index([productId])

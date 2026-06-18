@@ -1,11 +1,15 @@
+import type { UserRole } from "@/types";
+
 const STORAGE_KEYS = {
     authToken: 'auth_token',
+    authRole: 'auth_role',
 } as const;
 
 type StorageKey = keyof typeof STORAGE_KEYS;
 
 type StorageValueMap = {
     authToken: string;
+    authRole: UserRole;
     theme: 'light' | 'dark';
 };
 

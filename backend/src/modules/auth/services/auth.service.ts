@@ -5,7 +5,7 @@ import { User, USER_ROLE } from '@prisma/client';
 import { Hasher, InvalidTokenError, Jwt } from 'src/shared/libs';
 import { type JWTPayload } from 'jose';
 import { ENV } from 'src/shared/configs';
-import { CreateUserArgs, LoginArgs } from '../interfaces';
+import { CreateUserArgs, LoginArgs, LoginResponse } from '../interfaces';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +30,7 @@ export class AuthService {
         return newUser
     }
 
-    async login(args: LoginArgs): Promise<{ accessToken: string }> {
+    async login(args: LoginArgs): Promise<LoginResponse> {
         const { username, password } = args;
         const user = await this.authRepository.getByUsername(username)
 
@@ -43,7 +43,7 @@ export class AuthService {
 
         const accessToken = await this.createAccessToken(user);
 
-        return { accessToken };
+        return { accessToken, role: user.role };
 
     }
 

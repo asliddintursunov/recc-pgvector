@@ -7,6 +7,7 @@ import type {
     CreatePurchaseResponse,
     CreateProductBody,
     InteractionType,
+    LoginResponse,
     Product,
     RegisterCredentials,
     UpdateProductBody,
@@ -16,13 +17,14 @@ import { API_ENDPOINTS } from "../constants";
 import localstorage from "../lib/local-storage.lib";
 
 export const useLoginMutation = () => {
-    return useMutation<{ accessToken: string }, ApiError, AuthCredentials>({
+    return useMutation<LoginResponse, ApiError, AuthCredentials>({
         mutationFn: (credentials) =>
-            apiClient.post<{ accessToken: string }>(API_ENDPOINTS.AUTH.LOGIN, credentials, {
+            apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, credentials, {
                 skipAuth: true,
             }),
         onSuccess: (data) => {
             localstorage.set("authToken", data.accessToken);
+            localstorage.set("authRole", data.role);
         },
         onError: (error) => {
             toast.error(error.data.message);

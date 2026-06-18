@@ -29,7 +29,7 @@ export default function AuthPage() {
   const registerMutation = useRegisterMutation()
   const navigate = useNavigate()
 
-  if (localstorage.get("authToken")) {
+  if (localstorage.get("authToken") && localstorage.get("authRole")) {
     return <Navigate to={ROUTES.PRODUCTS.ROOT} replace />
   }
 

@@ -1,7 +1,15 @@
 import { ROUTES } from "./routes.constant";
-import { Box, ShoppingBasket, UserRound, UsersRound } from "lucide-react"
+import { Box, ShoppingBasket, UserRound, UsersRound, type LucideIcon } from "lucide-react"
+import type { UserRole } from "@/types";
 
-export const SIDEBAR_OPTIONS = [
+type SidebarOption = {
+    name: string;
+    route: string;
+    icon: LucideIcon;
+    roles?: UserRole[];
+};
+
+export const SIDEBAR_OPTIONS: SidebarOption[] = [
     {
         name: "Products",
         route: ROUTES.PRODUCTS.ROOT,
@@ -10,7 +18,8 @@ export const SIDEBAR_OPTIONS = [
     {
         name: "Purchases",
         route: ROUTES.PURCHASES.ROOT,
-        icon: ShoppingBasket
+        icon: ShoppingBasket,
+        roles: ["admin", "customer"],
     },
     {
         name: "Profile",
@@ -20,6 +29,7 @@ export const SIDEBAR_OPTIONS = [
     {
         name: "Users",
         route: ROUTES.USERS.ROOT,
-        icon: UsersRound
+        icon: UsersRound,
+        roles: ["admin"],
     }
-]
+] 

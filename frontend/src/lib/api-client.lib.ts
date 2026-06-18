@@ -16,7 +16,6 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
     body?: unknown;
     params?: Record<string, string | number | boolean | undefined>;
     skipAuth?: boolean;
-    skipAuthRetry?: boolean;
 };
 
 
@@ -67,7 +66,7 @@ function buildUrl(endpoint: string, params?: RequestOptions['params']): string {
 }
 
 async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
-    const { body, headers, params, method = 'GET', skipAuth = false, skipAuthRetry = false, ...rest } = options;
+    const { body, headers, params, method = 'GET', skipAuth = false, ...rest } = options;
     const token = skipAuth ? null : localstorage.get('authToken');
     const requestUrl = buildUrl(url, params);
 
@@ -78,11 +77,7 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
         ...rest,
     };
 
-    try {
-        return await executeRequest<T>(requestUrl, init);
-    } catch (error) {
-        throw error;
-    }
+    return executeRequest<T>(requestUrl, init);
 }
 
 export const apiClient = {

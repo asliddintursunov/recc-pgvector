@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { ROUTES } from "@/constants"
 
 import { lazy } from "react"

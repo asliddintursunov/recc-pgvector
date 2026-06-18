@@ -11,19 +11,20 @@ export const useProducts = () => {
     });
 };
 
-export const useRecommendedProducts = () => {
+export const useRecommendedProducts = (enabled = true) => {
     return useQuery<Product[], ApiError>({
         queryKey: ["products", "recommended"],
         queryFn: () => apiClient.get<Product[]>(API_ENDPOINTS.PRODUCTS.RECOMMENDED),
+        enabled,
         staleTime: 30_000,
     });
 };
 
-export const useProductDetails = (id: string | undefined) => {
+export const useProductDetails = (id: string | undefined, enabled = true) => {
     return useQuery<Product, ApiError>({
         queryKey: ["products", "detail", id],
         queryFn: () => apiClient.get<Product>(API_ENDPOINTS.PRODUCTS.DETAIL(id ?? "")),
-        enabled: Boolean(id),
+        enabled: Boolean(id) && enabled,
         staleTime: 60_000,
     });
 };
@@ -36,44 +37,47 @@ export const useProfile = () => {
     });
 };
 
-export const useCustomers = () => {
+export const useCustomers = (enabled = true) => {
     return useQuery<UserProfile[], ApiError>({
         queryKey: ["users", "customers"],
         queryFn: () => apiClient.get<UserProfile[]>(API_ENDPOINTS.USERS.CUSTOMERS),
+        enabled,
         staleTime: 60_000,
     });
 };
 
-export const useMerchants = () => {
+export const useMerchants = (enabled = true) => {
     return useQuery<UserProfile[], ApiError>({
         queryKey: ["users", "merchants"],
         queryFn: () => apiClient.get<UserProfile[]>(API_ENDPOINTS.USERS.MERCHANTS),
+        enabled,
         staleTime: 60_000,
     });
 };
 
-export const useUserDetails = (id: string | undefined) => {
+export const useUserDetails = (id: string | undefined, enabled = true) => {
     return useQuery<UserProfile | null, ApiError>({
         queryKey: ["users", "detail", id],
         queryFn: () => apiClient.get<UserProfile | null>(API_ENDPOINTS.USERS.DETAIL(id ?? "")),
-        enabled: Boolean(id),
+        enabled: Boolean(id) && enabled,
         staleTime: 60_000,
     });
 };
 
-export const usePurchases = () => {
+export const usePurchases = (enabled = true) => {
     return useQuery<Purchase[], ApiError>({
         queryKey: ["purchases"],
         queryFn: () => apiClient.get<Purchase[]>(API_ENDPOINTS.PURCHASES.ALL),
+        enabled,
         staleTime: 60_000,
     });
 };
 
-export const usePurchaseDetails = (id: string | undefined) => {
+export const usePurchaseDetails = (id: string | undefined, enabled = true) => {
     return useQuery<Purchase | null, ApiError>({
         queryKey: ["purchases", "detail", id],
         queryFn: () => apiClient.get<Purchase | null>(API_ENDPOINTS.PURCHASES.DETAIL(id ?? "")),
-        enabled: Boolean(id),
+        enabled: Boolean(id) && enabled,
         staleTime: 60_000,
     });
 };

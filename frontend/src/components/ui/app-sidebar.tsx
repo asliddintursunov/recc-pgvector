@@ -19,9 +19,14 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom"
 export function AppSidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const role = localstorage.get("authRole")
+  const visibleSidebarOptions = SIDEBAR_OPTIONS.filter((item) => {
+    return !item.roles || (role ? item.roles.includes(role) : false)
+  })
 
   const handleLogout = () => {
     localstorage.remove("authToken")
+    localstorage.remove("authRole")
     navigate(ROUTES.AUTH, { replace: true })
   }
 
@@ -49,7 +54,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {SIDEBAR_OPTIONS.map((item) => (
+              {visibleSidebarOptions.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton
                     asChild

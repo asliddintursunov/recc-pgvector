@@ -5,20 +5,19 @@ import { User, USER_ROLE } from '@prisma/client';
 import { Hasher, InvalidTokenError, Jwt } from 'src/shared/libs';
 import { type JWTPayload } from 'jose';
 import { ENV } from 'src/shared/configs';
-import { AuthArgs, RegisterArgs } from '../interfaces';
+import { CreateUserArgs, LoginArgs } from '../interfaces';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly authRepository: AuthRepository) { }
 
-    async register(args: RegisterArgs): Promise<User> {
-        const { username, password, merchantIntent } = args;
+    async register(args: CreateUserArgs): Promise<User> {
+        const { username, password, role } = args;
         const user = await this.authRepository.getByUsername(username)
 
         if (user) throw new ConflictException("User with this username already exists!")
 
         const hashedPassword = await Hasher.hash(password);
-        const role = merchantIntent ? USER_ROLE.merchant : USER_ROLE.customer;
 
         const newUser = await this.authRepository.create({
             username,
@@ -31,7 +30,7 @@ export class AuthService {
         return newUser
     }
 
-    async login(args: AuthArgs): Promise<{ accessToken: string }> {
+    async login(args: LoginArgs): Promise<{ accessToken: string }> {
         const { username, password } = args;
         const user = await this.authRepository.getByUsername(username)
 

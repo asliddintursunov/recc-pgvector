@@ -3,6 +3,7 @@ import { UserService } from "../services/user.service";
 import { CurrentUser } from "src/shared/decorators/current-user.decorator";
 import { type User } from "@prisma/client";
 import { Roles, RolesGuard } from "src/shared/guards";
+import { GetUserParamDto } from "../dto";
 
 @Controller('users')
 export class UserController {
@@ -35,8 +36,8 @@ export class UserController {
     @Roles('admin')
     @UseGuards(RolesGuard)
     async getById(
-        @Param('id') userId: string
+        @Param('id') id: GetUserParamDto['id']
     ) {
-        return this.userService.getProfile(userId);
+        return this.userService.getProfile(id);
     }
 }

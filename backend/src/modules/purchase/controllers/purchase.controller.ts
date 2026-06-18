@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { PurchaseService } from "../services/purchase.service";
 import { CurrentUser } from "src/shared/decorators/current-user.decorator";
 import { type User } from "@prisma/client";
-import { CreatePurchaseDto } from "../dtos";
+import { CreatePurchaseDto, GetPurchaseParamDto } from "../dtos";
 import { CreatePurchaseResponse, GetPurchasesResponse } from "../interfaces";
 import { Roles, RolesGuard } from "src/shared/guards";
 
@@ -25,10 +25,10 @@ export class PurchaseController {
     @UseGuards(RolesGuard)
     async getDetails(
         @CurrentUser() user: User,
-        @Param('id') purchaseId: string
+        @Param('id') id: GetPurchaseParamDto['id']
     ): Promise<GetPurchasesResponse | null> {
         return this.purchaseService.getDetails({
-            id: purchaseId,
+            id: id,
             userId: user.id,
             userRole: user.role,
         });

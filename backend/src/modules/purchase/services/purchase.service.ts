@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { PurchaseRepository } from "../repositories/purchase.repository";
 import { CreatePurchaseArgs, CreatePurchaseNormalizedArgs, GetPurchaseArgs, GetPurchaseDetailsArgs } from "../interfaces";
 import { USER_ROLE } from "@prisma/client";
@@ -17,6 +17,10 @@ export class PurchaseService {
 
     async create(args: CreatePurchaseArgs) {
         const { userId, userRole, products } = args;
+
+        if (typeof products !== 'object' || !Array.isArray(products) || products.length === 0) {
+            throw new BadRequestException('Please select at least one product to purchase!')
+        }
 
         if (userRole !== USER_ROLE.customer) {
             throw new ForbiddenException('Only customers can purchase products!')

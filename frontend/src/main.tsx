@@ -1,39 +1,21 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
-import { App } from "./App";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { Toaster } from "react-hot-toast";
-import "./index.css";
+import { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
+import "./index.css"
+import App from "./App.tsx"
+import { BrowserRouter } from "react-router-dom"
+import { ThemeProvider } from "./components/theme-provider.tsx"
+import { Toaster } from "react-hot-toast"
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: 0,
-    },
-  },
-});
-
-const rootElement = document.getElementById("root");
-
-if (!rootElement) {
-  throw new Error("Root element was not found.");
-}
-
-ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ErrorBoundary>
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <BrowserRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <ThemeProvider>
           <App />
-          <Toaster position="top-center" reverseOrder={false} />
-        </ErrorBoundary>
-      </BrowserRouter>
-    </QueryClientProvider>
-  </React.StrictMode>,
-);
+          <Toaster position="top-center" />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  </StrictMode>
+)

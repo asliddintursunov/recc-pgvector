@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { API_ENDPOINTS } from "../constants/api-endpoint.constant";
-import { apiClient } from "../lib";
-import type { ApiError, Product } from "../types";
+import { apiClient, ApiError } from "../lib";
+import type { Product } from "../types";
+import { API_ENDPOINTS } from "../constants/api-endpoints.constant";
 
 export const useProducts = () => {
     return useQuery<Product[], ApiError>({

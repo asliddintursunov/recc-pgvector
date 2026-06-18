@@ -5,9 +5,7 @@ const STORAGE_KEYS = {
 type StorageKey = keyof typeof STORAGE_KEYS;
 
 type StorageValueMap = {
-    cart: { id: string; quantity: number; price: number }[];
     authToken: string;
-    user: { id: string; name: string; email: string };
     theme: 'light' | 'dark';
 };
 

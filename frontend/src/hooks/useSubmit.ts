@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import {
+import type {
     ApiError,
     AuthCredentials,
     CreateProductBody,
@@ -9,7 +9,7 @@ import {
     UpdateProductBody,
 } from "../types";
 import { apiClient } from "../lib";
-import { API_ENDPOINTS } from "../constants/api-endpoint.constant";
+import { API_ENDPOINTS } from "../constants";
 import localstorage from "../lib/local-storage.lib";
 
 export const useLoginMutation = () => {

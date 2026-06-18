@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { AuthDto } from '../dtos';
+import { AuthDto, RegisterDto } from '../dtos';
 import { Public } from 'src/shared/decorators';
 import { LoginResponse, RegisterResponse } from '../interfaces';
 
@@ -10,7 +10,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('register')
-  async register(@Body() body: AuthDto): Promise<RegisterResponse> {
+  async register(@Body() body: RegisterDto): Promise<RegisterResponse> {
 
     await this.authService.register(body);
 

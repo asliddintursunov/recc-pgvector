@@ -1,27 +1,29 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { AuthRepository } from '../repositories/auth.repository';
-import { User } from '@prisma/client';
+import { User, USER_ROLE } from '@prisma/client';
 
 import { Hasher, InvalidTokenError, Jwt } from 'src/shared/libs';
 import { type JWTPayload } from 'jose';
 import { ENV } from 'src/shared/configs';
-import { AuthArgs } from '../interfaces';
+import { AuthArgs, RegisterArgs } from '../interfaces';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly authRepository: AuthRepository) { }
 
-    async register(args: AuthArgs): Promise<User> {
-        const { username, password } = args;
+    async register(args: RegisterArgs): Promise<User> {
+        const { username, password, merchantIntent } = args;
         const user = await this.authRepository.getByUsername(username)
 
         if (user) throw new ConflictException("User with this username already exists!")
 
         const hashedPassword = await Hasher.hash(password);
+        const role = merchantIntent ? USER_ROLE.merchant : USER_ROLE.customer;
 
         const newUser = await this.authRepository.create({
             username,
-            password: hashedPassword
+            password: hashedPassword,
+            role,
         })
 
         if (!newUser) throw new Error("Error creating a user, please try again!")
@@ -40,16 +42,17 @@ export class AuthService {
 
         if (!isEqual) throw new UnprocessableEntityException('Username or password is wrong, please try again!');
 
-        const accessToken = await this.createAccessToken(user.id);
+        const accessToken = await this.createAccessToken(user);
 
         return { accessToken };
 
     }
 
 
-    async createAccessToken(userId: string): Promise<string> {
+    async createAccessToken(user: User): Promise<string> {
         const payload: AccessTokenPayload = {
-            sub: userId,
+            sub: user.id,
+            role: user.role,
         };
         const options = {
             secret: ENV.AUTH_JWT_ACCESS_SECRET,
@@ -81,4 +84,5 @@ export class AuthService {
 
 type AccessTokenPayload = JWTPayload & {
     sub: string;
+    role: USER_ROLE;
 };

@@ -13,20 +13,11 @@ model User {
   id                String            @id @default(uuid())
   username          String            @unique
   password          String
-  createdAt         DateTime          @default(now())
   role              USER_ROLE         @default(customer)
-  merchant          Merchant?
-  interactions      Interaction[]
+  createdAt         DateTime          @default(now())
+  products          Product[]
   purchaseHistories PurchaseHistory[]
-}
-
-model Merchant {
-  id        String    @id @default(uuid())
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  products  Product[]
+  interactions      Interaction[]
 }
 
 enum USER_ROLE {
@@ -40,15 +31,19 @@ model Product {
   title             String
   description       String?
   price             Float                        @default(0.0)
-  createdAt         DateTime                     @default(now())
-  creatorId         String
-  isDeleted         Boolean                      @default(false)
   imageUrl          String?
   tags              PRODUCT_TAG[]
-  interactions      Interaction[]
+  isDeleted         Boolean                      @default(false)
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+  merchantId        String
+  merchant          User                         @relation(fields: [merchantId], references: [id])
   embedding         Unsupported("vector(1536)")?
+  interactions      Interaction[]
   purchaseHistories PurchaseHistory[]
-  creator           Merchant                     @relation(fields: [creatorId], references: [id])
+
+  @@index([merchantId])
+  @@index([isDeleted])
 }
 
 enum PRODUCT_TAG {
@@ -66,14 +61,27 @@ enum PRODUCT_TAG {
   books
 }
 
+model PurchaseHistory {
+  id        String   @id @default(uuid())
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  userId    String
+  productId String
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@index([userId])
+  @@index([productId])
+}
+
 model Interaction {
   id         String           @id @default(uuid())
-  user       User             @relation(fields: [userId], references: [id])
-  product    Product          @relation(fields: [productId], references: [id])
   actionType INTERACTION_TYPE
+  createdAt  DateTime         @default(now())
   userId     String
   productId  String
-  createdAt  DateTime         @default(now())
+  user       User             @relation(fields: [userId], references: [id])
+  product    Product          @relation(fields: [productId], references: [id])
 
   @@index([userId])
   @@index([productId])
@@ -83,17 +91,4 @@ enum INTERACTION_TYPE {
   search
   click
   like
-}
-
-model PurchaseHistory {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
-  createdAt DateTime @default(now())
-  userId    String
-  productId String
-  quantity  Int
-
-  @@index([userId])
-  @@index([productId])
 }

@@ -1,19 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/services/prisma.service";
-import { CreatePurchaseArgs, CreatePurchaseNormalizedArgs } from "../interfaces";
+import { CreatePurchaseNormalizedArgs, GetPurchaseArgs, GetPurchaseDetailsArgs } from "../interfaces";
+import { USER_ROLE } from "@prisma/client";
 
 @Injectable()
 export class PurchaseRepository {
     constructor(private readonly prismaService: PrismaService) { }
 
-    async getAll(userId: string) {
+    async getAll(args: GetPurchaseArgs) {
+        const { userId, userRole } = args;
+
         return await this.prismaService.purchaseHistory.findMany({
             where: {
-                userId
+                ...(userRole === USER_ROLE.customer && { userId })
             },
             select: {
                 id: true,
-                purchaseDate: true,
+                createdAt: true,
                 quantity: true,
                 product: {
                     select: {
@@ -27,14 +30,17 @@ export class PurchaseRepository {
         })
     }
 
-    async getDetails(id: string) {
+    async getDetails(args: GetPurchaseDetailsArgs) {
+        const { id, userId, userRole } = args;
+
         return await this.prismaService.purchaseHistory.findFirst({
             where: {
-                id
+                id,
+                ...(userRole === USER_ROLE.customer && { userId })
             },
             select: {
                 id: true,
-                purchaseDate: true,
+                createdAt: true,
                 quantity: true,
                 product: {
                     select: {

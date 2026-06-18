@@ -3,6 +3,7 @@ import {
     IsArray,
     IsEnum,
     IsNotEmpty,
+    IsNumber,
     IsOptional,
     IsString,
 } from 'class-validator';
@@ -15,6 +16,14 @@ export class CreateProductDto {
     @IsString()
     @IsOptional()
     description?: string;
+
+    @IsNumber()
+    @IsOptional()
+    price?: number;
+
+    @IsString()
+    @IsOptional()
+    imageUrl?: string;
 
     @IsArray()
     @IsEnum(PRODUCT_TAG, {

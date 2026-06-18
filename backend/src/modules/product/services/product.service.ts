@@ -18,6 +18,10 @@ export class ProductService {
     ) { }
 
     async create(args: CreateProductArgs): Promise<Product> {
+        if (args.userRole !== USER_ROLE.merchant) {
+            throw new ForbiddenException('Only merchants can create products!')
+        }
+
         const embedding = await this.embeddingService.generateProductEmbedding(
             this.buildEmbeddingText(args),
         )
@@ -34,14 +38,18 @@ export class ProductService {
     }
 
     async update(args: UpdateProductArgs): Promise<Product> {
+        if (args.userRole !== USER_ROLE.merchant) {
+            throw new ForbiddenException('Only merchants can update products!')
+        }
+
         const product = await this.productRepository.getByIdForUpdate(args.id)
 
         if (!product) {
             throw new NotFoundException('Product not found!')
         }
 
-        if (args.userRole !== USER_ROLE.admin && product.creator.userId !== args.userId) {
-            throw new ForbiddenException('Only product creator or admin can update the product!')
+        if (product.merchantId !== args.userId) {
+            throw new ForbiddenException('Only product merchant can update the product!')
         }
 
         const embeddingSource = {

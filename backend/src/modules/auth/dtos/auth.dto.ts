@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 
 export class AuthDto {
@@ -7,4 +7,10 @@ export class AuthDto {
 
     @IsString()
     password!: string;
+}
+
+export class RegisterDto extends AuthDto {
+    @IsBoolean()
+    @IsOptional()
+    merchantIntent?: boolean;
 }

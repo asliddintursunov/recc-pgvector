@@ -3,12 +3,6 @@ import { PrismaService } from "src/modules/prisma/services/prisma.service";
 import { CreateProductArgs, CreateProductWithEmbeddingArgs, GetProductByIdArgs, GetProductArgs, UpdateProductWithEmbeddingArgs } from "../interfaces";
 import { Product, USER_ROLE } from "@prisma/client";
 
-type ProductWithCreator = Product & {
-    creator: {
-        userId: string;
-    };
-};
-
 @Injectable()
 export class ProductRepository {
     constructor(private readonly prismaService: PrismaService) { }
@@ -19,16 +13,10 @@ export class ProductRepository {
         const { userId, userRole: _userRole, ...productData } = data;
 
         return this.prismaService.$transaction(async (tx) => {
-            const merchant = await tx.merchant.upsert({
-                where: { userId },
-                update: {},
-                create: { userId },
-            });
-
             const product = await tx.product.create({
                 data: {
                     ...productData,
-                    creatorId: merchant.id,
+                    merchantId: userId,
                 }
             });
 
@@ -69,24 +57,17 @@ export class ProductRepository {
             where: {
                 id,
                 isDeleted: false,
-                ...(userRole === 'merchant' && { creator: { userId: { not: userId } } })
+                ...(userRole === USER_ROLE.merchant && { merchantId: userId })
             }
         }) ?? null;
     }
 
-    async getByIdForUpdate(id: string): Promise<ProductWithCreator | null> {
+    async getByIdForUpdate(id: string): Promise<Product | null> {
         return await this.prismaService.product.findFirst({
             where: {
                 id,
                 isDeleted: false,
             },
-            include: {
-                creator: {
-                    select: {
-                        userId: true,
-                    }
-                }
-            }
         }) ?? null;
     }
 
@@ -96,15 +77,14 @@ export class ProductRepository {
         return await this.prismaService.product.findMany({
             where: {
                 isDeleted: false,
-                ...(userRole === 'merchant' && { creator: { userId: { not: userId } } })
+                ...(userRole === USER_ROLE.merchant && { merchantId: userId })
             }
         });
     }
 
 
     async getRecommended(args: GetProductArgs): Promise<Product[]> {
-        const { userId, userRole } = args;
-        const isMerchant = userRole === 'merchant';
+        const { userId } = args;
 
         return await this.prismaService.$queryRaw<Product[]>`
         WITH interacted_products AS (
@@ -125,14 +105,16 @@ export class ProductRepository {
             p."id",
             p."title",
             p."description",
-            p."createdAt",
+            p."price",
+            p."imageUrl",
             p."tags",
-            p."price"
+            p."isDeleted",
+            p."createdAt",
+            p."updatedAt",
+            p."merchantId"
         FROM "Product" p
-        JOIN "Merchant" m ON m."id" = p."creatorId"
         WHERE p."embedding" IS NOT NULL
         AND p."isDeleted" = false
-        AND (${isMerchant} = false OR m."userId" != ${userId})
         AND NOT EXISTS (
             SELECT 1
             FROM "Interaction" i

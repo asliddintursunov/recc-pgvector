@@ -1,7 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { User, USER_ROLE } from "@prisma/client";
 import { PrismaService } from "src/modules/prisma/services/prisma.service";
-import { CreateMerchantArgs } from "../interfaces";
+
+const userProfileSelect = {
+    id: true,
+    username: true,
+    role: true,
+    createdAt: true,
+} as const;
 
 @Injectable()
 export class UserRepository {
@@ -17,25 +23,17 @@ export class UserRepository {
         return user ?? null
     }
 
-    async switchToMerchant(args: CreateMerchantArgs): Promise<User> {
-        return this.prismaService.$transaction(async (tx) => {
-            await tx.merchant.upsert({
-                where: { userId: args.userId },
-                update: {},
-                create: { userId: args.userId },
-            });
-
-            return tx.user.update({
-                where: { id: args.userId },
-                data: { role: USER_ROLE.merchant },
-            });
+    async getProfile(id: string) {
+        return this.prismaService.user.findFirst({
+            where: { id },
+            select: userProfileSelect,
         });
     }
 
-    async switchToCustomer(userId: string): Promise<User> {
-        return this.prismaService.user.update({
-            where: { id: userId },
-            data: { role: USER_ROLE.customer },
+    async getByRole(role: USER_ROLE) {
+        return this.prismaService.user.findMany({
+            where: { role },
+            select: userProfileSelect,
         });
     }
 }

@@ -1,21 +1,26 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import { PurchaseRepository } from "../repositories/purchase.repository";
-import { CreatePurchaseArgs, CreatePurchaseNormalizedArgs } from "../interfaces";
+import { CreatePurchaseArgs, CreatePurchaseNormalizedArgs, GetPurchaseArgs, GetPurchaseDetailsArgs } from "../interfaces";
+import { USER_ROLE } from "@prisma/client";
 
 @Injectable()
 export class PurchaseService {
     constructor(private readonly purchaseRepository: PurchaseRepository) { }
 
-    async getAll(userId: string) {
-        return this.purchaseRepository.getAll(userId);
+    async getAll(args: GetPurchaseArgs) {
+        return this.purchaseRepository.getAll(args);
     }
 
-    async getDetails(purchaseId: string) {
-        return this.purchaseRepository.getDetails(purchaseId);
+    async getDetails(args: GetPurchaseDetailsArgs) {
+        return this.purchaseRepository.getDetails(args);
     }
 
     async create(args: CreatePurchaseArgs) {
-        const { userId, products } = args;
+        const { userId, userRole, products } = args;
+
+        if (userRole !== USER_ROLE.customer) {
+            throw new ForbiddenException('Only customers can purchase products!')
+        }
 
         const data: CreatePurchaseNormalizedArgs[] = products.map(product => ({
             userId,

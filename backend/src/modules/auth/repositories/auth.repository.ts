@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/modules/prisma/services/prisma.service';
-import { AuthArgs } from '../interfaces';
+import { CreateUserArgs } from '../interfaces';
 
 @Injectable()
 export class AuthRepository {
@@ -11,7 +11,7 @@ export class AuthRepository {
         return await this.prismaService.user.findFirst({ where: { username } })
     }
 
-    async create(data: AuthArgs): Promise<User | null> {
+    async create(data: CreateUserArgs): Promise<User | null> {
         return await this.prismaService.user.create({ data })
     }
 }

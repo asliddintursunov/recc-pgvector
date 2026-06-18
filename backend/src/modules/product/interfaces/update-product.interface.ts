@@ -6,6 +6,8 @@ export interface UpdateProductArgs {
     userRole: USER_ROLE,
     title?: string;
     description?: string;
+    price?: number;
+    imageUrl?: string;
     tags?: PRODUCT_TAG[]
 }
 

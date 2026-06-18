@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { UserRepository } from "../repositories/user.respository";
-import { CreateMerchantArgs } from "../interfaces";
+import { USER_ROLE } from "@prisma/client";
 
 @Injectable()
 export class UserService {
@@ -8,11 +8,15 @@ export class UserService {
         private readonly userRepository: UserRepository
     ) { }
 
-    async switchToMerchant(args: CreateMerchantArgs) {
-        return this.userRepository.switchToMerchant(args);
+    async getProfile(userId: string) {
+        return this.userRepository.getProfile(userId);
     }
 
-    async switchToCustomer(userId: string) {
-        return this.userRepository.switchToCustomer(userId);
+    async getCustomers() {
+        return this.userRepository.getByRole(USER_ROLE.customer);
+    }
+
+    async getMerchants() {
+        return this.userRepository.getByRole(USER_ROLE.merchant);
     }
 }

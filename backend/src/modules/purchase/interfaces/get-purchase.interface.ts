@@ -1,4 +1,13 @@
-import { PRODUCT_TAG } from "@prisma/client";
+import { PRODUCT_TAG, USER_ROLE } from "@prisma/client";
+
+export interface GetPurchaseArgs {
+    userId: string;
+    userRole: USER_ROLE;
+}
+
+export interface GetPurchaseDetailsArgs extends GetPurchaseArgs {
+    id: string;
+}
 
 export interface GetPurchaseProductResponse {
     title: string;
@@ -9,7 +18,7 @@ export interface GetPurchaseProductResponse {
 
 export interface GetPurchaseHistoryResponse {
     id: string;
-    purchaseDate: Date;
+    createdAt: Date;
     quantity: number;
     product: GetPurchaseProductResponse;
 }

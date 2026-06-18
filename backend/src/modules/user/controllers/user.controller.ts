@@ -1,7 +1,8 @@
-import { Controller, Post } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { UserService } from "../services/user.service";
 import { CurrentUser } from "src/shared/decorators/current-user.decorator";
 import { type User } from "@prisma/client";
+import { Roles, RolesGuard } from "src/shared/guards";
 
 @Controller('users')
 export class UserController {
@@ -9,19 +10,33 @@ export class UserController {
         private readonly userService: UserService
     ) { }
 
-    @Post("merchant")
-    async switchToMerchant(
+    @Get("profile")
+    async getProfile(
         @CurrentUser() user: User
     ) {
-        return this.userService.switchToMerchant({
-            userId: user.id,
-        });
+        return this.userService.getProfile(user.id);
     }
 
-    @Post("customer")
-    async switchToCustomer(
-        @CurrentUser() user: User
+    @Get("customers")
+    @Roles('admin')
+    @UseGuards(RolesGuard)
+    async getCustomers() {
+        return this.userService.getCustomers();
+    }
+
+    @Get("merchants")
+    @Roles('admin')
+    @UseGuards(RolesGuard)
+    async getMerchants() {
+        return this.userService.getMerchants();
+    }
+
+    @Get(":id")
+    @Roles('admin')
+    @UseGuards(RolesGuard)
+    async getById(
+        @Param('id') userId: string
     ) {
-        return this.userService.switchToCustomer(user.id);
+        return this.userService.getProfile(userId);
     }
 }

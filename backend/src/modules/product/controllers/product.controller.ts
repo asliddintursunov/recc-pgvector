@@ -25,6 +25,8 @@ export class ProductController {
     }
 
     @Get("recommended")
+    @Roles('customer')
+    @UseGuards(RolesGuard)
     async getRecommended(@CurrentUser() user: User): Promise<Product[]> {
         return await this.productService.getRecommended({
             userId: user.id,
@@ -46,7 +48,7 @@ export class ProductController {
     }
 
     @Post()
-    @Roles('admin', 'merchant')
+    @Roles('merchant')
     @UseGuards(RolesGuard)
     async create(@CurrentUser() user: User, @Body() body: CreateProductDto): Promise<Product> {
         return await this.productService.create({
@@ -57,7 +59,7 @@ export class ProductController {
     }
 
     @Patch(":id")
-    @Roles('admin', 'merchant')
+    @Roles('merchant')
     @UseGuards(RolesGuard)
     async update(
         @CurrentUser() user: User,
@@ -74,6 +76,8 @@ export class ProductController {
     }
 
     @Post(":id/interaction")
+    @Roles('customer')
+    @UseGuards(RolesGuard)
     async createInteraction(
         @CurrentUser() user: User,
         @Param() params: CreateInteractionParamsDto,

@@ -3,6 +3,8 @@ import { toast } from "react-hot-toast";
 import type {
     ApiError,
     AuthCredentials,
+    CreatePurchaseBody,
+    CreatePurchaseResponse,
     CreateProductBody,
     InteractionType,
     Product,
@@ -54,7 +56,7 @@ export const useCreateProduct = () => {
     const queryClient = useQueryClient();
 
     return useMutation<Product, ApiError, CreateProductBody>({
-        mutationFn: (body) => apiClient.post<Product>(API_ENDPOINTS.PRODUCTS.ALL, body),
+        mutationFn: (body) => apiClient.post<Product>(API_ENDPOINTS.PRODUCTS.CREATE, body),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Product created");
@@ -85,9 +87,34 @@ export const useUpdateProduct = () => {
 };
 
 export const useCreateInteraction = () => {
-    return useMutation<void, ApiError, { productId: string; actionType: InteractionType }>({
+    const queryClient = useQueryClient();
+
+    return useMutation<boolean, ApiError, { productId: string; actionType: InteractionType }>({
         mutationFn: ({ productId, actionType }) =>
-            apiClient.post(API_ENDPOINTS.PRODUCTS.INTERACT(productId), { actionType }),
+            apiClient.post<boolean>(API_ENDPOINTS.PRODUCTS.INTERACT(productId), { actionType }),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["products", "recommended"] });
+        },
+        onError: (error) => {
+            toast.error(error.data.message);
+        }
+    })
+};
+
+export const useCreatePurchase = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<CreatePurchaseResponse, ApiError, CreatePurchaseBody[]>({
+        mutationFn: (body) =>
+            apiClient.post<CreatePurchaseResponse>(API_ENDPOINTS.PURCHASES.CREATE, body),
+        onSuccess: async (data) => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ["purchases"] }),
+                queryClient.invalidateQueries({ queryKey: ["products"] }),
+                queryClient.invalidateQueries({ queryKey: ["products", "recommended"] }),
+            ]);
+            toast.success(data.message);
+        },
         onError: (error) => {
             toast.error(error.data.message);
         }

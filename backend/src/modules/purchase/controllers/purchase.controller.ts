@@ -3,18 +3,18 @@ import { PurchaseService } from "../services/purchase.service";
 import { CurrentUser } from "src/shared/decorators/current-user.decorator";
 import { type User } from "@prisma/client";
 import { CreatePurchaseDto } from "../dtos";
-import { CreatePurchaseResponse, GetPurchaseHistoryResponse } from "../interfaces";
+import { CreatePurchaseResponse, GetPurchasesResponse } from "../interfaces";
 import { Roles, RolesGuard } from "src/shared/guards";
 
-@Controller('purchase')
+@Controller('purchases')
 export class PurchaseController {
     constructor(private readonly purchaseService: PurchaseService) { }
 
-    @Get('history')
+    @Get()
     @Roles('admin', 'customer')
     @UseGuards(RolesGuard)
-    async getAll(@CurrentUser() user: User): Promise<GetPurchaseHistoryResponse[]> {
-        return this.purchaseService.getAll({
+    async get(@CurrentUser() user: User): Promise<GetPurchasesResponse[]> {
+        return this.purchaseService.get({
             userId: user.id,
             userRole: user.role,
         });
@@ -26,7 +26,7 @@ export class PurchaseController {
     async getDetails(
         @CurrentUser() user: User,
         @Param('id') purchaseId: string
-    ): Promise<GetPurchaseHistoryResponse | null> {
+    ): Promise<GetPurchasesResponse | null> {
         return this.purchaseService.getDetails({
             id: purchaseId,
             userId: user.id,

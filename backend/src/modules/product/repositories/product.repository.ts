@@ -72,7 +72,7 @@ export class ProductRepository {
     }
 
 
-    async getAll(args: GetProductArgs): Promise<Product[]> {
+    async get(args: GetProductArgs): Promise<Product[]> {
         const { userId, userRole } = args
         return await this.prismaService.product.findMany({
             where: {

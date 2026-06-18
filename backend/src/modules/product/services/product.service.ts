@@ -74,8 +74,8 @@ export class ProductService {
         return updatedProduct
     }
 
-    async getAll(args: GetProductArgs): Promise<Product[]> {
-        const products = await this.productRepository.getAll(args)
+    async get(args: GetProductArgs): Promise<Product[]> {
+        const products = await this.productRepository.get(args)
 
         return products
     }

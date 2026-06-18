@@ -7,7 +7,7 @@ import { USER_ROLE } from "@prisma/client";
 export class PurchaseRepository {
     constructor(private readonly prismaService: PrismaService) { }
 
-    async getAll(args: GetPurchaseArgs) {
+    async get(args: GetPurchaseArgs) {
         const { userId, userRole } = args;
 
         return await this.prismaService.purchaseHistory.findMany({

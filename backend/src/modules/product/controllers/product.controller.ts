@@ -15,10 +15,10 @@ export class ProductController {
     ) { }
 
     @Get()
-    async getAll(
+    async get(
         @CurrentUser() user: User
     ): Promise<Product[]> {
-        return await this.productService.getAll({
+        return await this.productService.get({
             userId: user.id,
             userRole: user.role,
         });

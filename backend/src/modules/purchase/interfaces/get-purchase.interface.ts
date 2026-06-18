@@ -16,7 +16,7 @@ export interface GetPurchaseProductResponse {
     price: number;
 }
 
-export interface GetPurchaseHistoryResponse {
+export interface GetPurchasesResponse {
     id: string;
     createdAt: Date;
     quantity: number;

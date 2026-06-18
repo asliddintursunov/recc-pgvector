@@ -7,8 +7,8 @@ import { USER_ROLE } from "@prisma/client";
 export class PurchaseService {
     constructor(private readonly purchaseRepository: PurchaseRepository) { }
 
-    async getAll(args: GetPurchaseArgs) {
-        return this.purchaseRepository.getAll(args);
+    async get(args: GetPurchaseArgs) {
+        return this.purchaseRepository.get(args);
     }
 
     async getDetails(args: GetPurchaseDetailsArgs) {

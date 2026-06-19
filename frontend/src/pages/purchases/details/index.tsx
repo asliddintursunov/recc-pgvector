@@ -1,3 +1,5 @@
+import AccessRestricted from "@/components/AccessRestricted"
+import Empty from "@/components/Empty"
 import {
   Card,
   CardContent,
@@ -25,14 +27,10 @@ export default function PurchasesDetailPage() {
   if (!canViewPurchase) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Purchase detail</CardTitle>
-            <CardDescription>
-              Purchase details are available to customer and admin accounts.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <AccessRestricted
+          title="Purchase detail"
+          description="Purchase details are available to customer and admin accounts."
+        />
       </main>
     )
   }
@@ -48,12 +46,10 @@ export default function PurchasesDetailPage() {
   if (!purchase) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Purchase not found</CardTitle>
-            <CardDescription>No purchase exists for ID {id}.</CardDescription>
-          </CardHeader>
-        </Card>
+        <Empty
+          title="Purchase not found"
+          description={`No purchase exists for ID ${id}.`}
+        />
       </main>
     )
   }

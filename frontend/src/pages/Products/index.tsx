@@ -1,3 +1,4 @@
+import Empty from "@/components/Empty"
 import { ProductDrawer } from "@/components/product-drawer"
 import ProductCard from "@/components/ProductCard"
 import { Button } from "@/components/ui/button"
@@ -88,16 +89,32 @@ export default function ProductsPage() {
                 : "Available product catalog."}
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {data?.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                role={role ?? undefined}
-                onEdit={openEditDrawer}
-              />
-            ))}
-          </div>
+          {(data ?? []).length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {data?.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  role={role ?? undefined}
+                  onEdit={openEditDrawer}
+                />
+              ))}
+            </div>
+          ) : (
+            <Empty
+              title="No products found"
+              description={
+                isMerchant
+                  ? "Create your first product to start building your catalog."
+                  : "There are no products available right now."
+              }
+              action={
+                isMerchant ? (
+                  <Button onClick={openCreateDrawer}>Create product</Button>
+                ) : undefined
+              }
+            />
+          )}
         </section>
       </section>
       <ProductDrawer

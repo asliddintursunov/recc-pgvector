@@ -1,3 +1,5 @@
+import AccessRestricted from "@/components/AccessRestricted"
+import Empty from "@/components/Empty"
 import {
   Card,
   CardContent,
@@ -21,14 +23,10 @@ export default function UsersDetailPage() {
   if (!isAdmin) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>User detail</CardTitle>
-            <CardDescription>
-              Only admin accounts can view user details.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <AccessRestricted
+          title="User detail"
+          description="Only admin accounts can view user details."
+        />
       </main>
     )
   }
@@ -44,11 +42,10 @@ export default function UsersDetailPage() {
   if (!userQuery.data) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>User not found</CardTitle>
-          </CardHeader>
-        </Card>
+        <Empty
+          title="User not found"
+          description={`No user exists for ID ${id}.`}
+        />
       </main>
     )
   }

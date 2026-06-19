@@ -1,12 +1,11 @@
 import CartActions from "@/components/CartActions"
+import AccessRestricted from "@/components/AccessRestricted"
+import Empty from "@/components/Empty"
 import ProductImage from "@/components/ProductImage"
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import {
   Table,
@@ -75,14 +74,10 @@ export default function CartPage() {
     return (
       <main className="min-h-svh p-6">
         <section className="mx-auto w-full max-w-5xl">
-          <Card>
-            <CardHeader>
-              <CardTitle>Cart</CardTitle>
-              <CardDescription>
-                Cart checkout is available to customer accounts.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <AccessRestricted
+            title="Cart"
+            description="Cart checkout is available to customer accounts."
+          />
         </section>
       </main>
     )
@@ -92,17 +87,15 @@ export default function CartPage() {
     return (
       <main className="min-h-svh p-6">
         <section className="mx-auto w-full max-w-5xl">
-          <Card>
-            <CardHeader>
-              <CardTitle>Cart</CardTitle>
-              <CardDescription>Your cart is empty.</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <Empty
+            title="Your cart is empty"
+            description="Add products to your cart before checkout."
+            action={
               <Button asChild>
                 <Link to={ROUTES.PRODUCTS.ROOT}>Browse products</Link>
               </Button>
-            </CardContent>
-          </Card>
+            }
+          />
         </section>
       </main>
     )

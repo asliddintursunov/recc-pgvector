@@ -1,3 +1,5 @@
+import AccessRestricted from "@/components/AccessRestricted"
+import Empty from "@/components/Empty"
 import {
   Card,
   CardContent,
@@ -26,6 +28,15 @@ import { Link } from "react-router-dom"
 type UsersTab = "customers" | "merchants"
 
 function UserTable({ title, users }: { title: string; users: UserProfile[] }) {
+  if (users.length === 0) {
+    return (
+      <Empty
+        title={`No ${title.toLowerCase()} found`}
+        description={`There are no ${title.toLowerCase()} accounts to show.`}
+      />
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -58,16 +69,6 @@ function UserTable({ title, users }: { title: string; users: UserProfile[] }) {
                 </TableCell>
               </TableRow>
             ))}
-            {users.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-center text-muted-foreground"
-                >
-                  No users found.
-                </TableCell>
-              </TableRow>
-            ) : null}
           </TableBody>
         </Table>
       </CardContent>
@@ -87,14 +88,10 @@ export default function UsersPage() {
   if (!isAdmin) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Users</CardTitle>
-            <CardDescription>
-              Only admin accounts can view user directories.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <AccessRestricted
+          title="Users"
+          description="Only admin accounts can view user directories."
+        />
       </main>
     )
   }

@@ -1,9 +1,8 @@
+import AccessRestricted from "@/components/AccessRestricted"
+import Empty from "@/components/Empty"
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -30,14 +29,10 @@ export default function PurchasesPage() {
   if (!canViewPurchases) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Purchases</CardTitle>
-            <CardDescription>
-              Purchases are available to customer and admin accounts.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <AccessRestricted
+          title="Purchases"
+          description="Purchases are available to customer and admin accounts."
+        />
       </main>
     )
   }
@@ -51,13 +46,15 @@ export default function PurchasesPage() {
             Purchase history and product quantities.
           </p>
         </div>
-        <Card>
-          <CardContent className="pt-6">
-            {isPurchasesLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <Spinner className="size-6" />
-              </div>
-            ) : (
+        {isPurchasesLoading ? (
+          <Card>
+            <CardContent className="flex items-center justify-center py-10">
+              <Spinner className="size-6" />
+            </CardContent>
+          </Card>
+        ) : (purchases ?? []).length > 0 ? (
+          <Card>
+            <CardContent className="pt-6">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -97,21 +94,16 @@ export default function PurchasesPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {(purchases ?? []).length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={6}
-                        className="text-center text-muted-foreground"
-                      >
-                        No purchases found.
-                      </TableCell>
-                    </TableRow>
-                  ) : null}
                 </TableBody>
               </Table>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <Empty
+            title="No purchases found"
+            description="Your completed purchases will appear here."
+          />
+        )}
       </section>
     </main>
   )

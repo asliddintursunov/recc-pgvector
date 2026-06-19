@@ -1,5 +1,6 @@
 import { ProductDrawer } from "@/components/product-drawer"
 import CartActions from "@/components/CartActions"
+import Empty from "@/components/Empty"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -77,12 +78,10 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Product not found</CardTitle>
-            <CardDescription>No product exists for ID {id}.</CardDescription>
-          </CardHeader>
-        </Card>
+        <Empty
+          title="Product not found"
+          description={`No product exists for ID ${id}.`}
+        />
       </main>
     )
   }

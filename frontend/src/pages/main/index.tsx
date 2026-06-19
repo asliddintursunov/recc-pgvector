@@ -1,3 +1,5 @@
+import AccessRestricted from "@/components/AccessRestricted"
+import Empty from "@/components/Empty"
 import ProductCard from "@/components/ProductCard"
 import { Card, CardContent } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
@@ -28,11 +30,10 @@ export default function MainPage() {
           </div>
 
           {!isCustomer ? (
-            <Card>
-              <CardContent className="py-10 text-center text-muted-foreground">
-                Recommended products are available to customer accounts.
-              </CardContent>
-            </Card>
+            <AccessRestricted
+              title="Recommended products"
+              description="Recommended products are available to customer accounts."
+            />
           ) : isLoading ? (
             <Card>
               <CardContent className="flex items-center justify-center py-10">
@@ -51,11 +52,10 @@ export default function MainPage() {
               ))}
             </div>
           ) : (
-            <Card>
-              <CardContent className="py-10 text-center text-muted-foreground">
-                No recommended products found.
-              </CardContent>
-            </Card>
+            <Empty
+              title="No recommended products found"
+              description="Interact with products to start seeing recommendations."
+            />
           )}
         </section>
       </section>

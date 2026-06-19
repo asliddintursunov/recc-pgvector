@@ -1,3 +1,4 @@
+import Empty from "@/components/Empty"
 import {
   Card,
   CardContent,
@@ -27,14 +28,10 @@ export default function ProfilePage() {
   if (profileError || !profile) {
     return (
       <main className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile unavailable</CardTitle>
-            <CardDescription>
-              Your profile could not be loaded right now.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <Empty
+          title="Profile unavailable"
+          description="Your profile could not be loaded right now."
+        />
       </main>
     )
   }

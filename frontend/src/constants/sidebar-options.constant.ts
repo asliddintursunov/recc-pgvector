@@ -1,5 +1,5 @@
 import { ROUTES } from "./routes.constant";
-import { Box, House, LayoutDashboard, ShoppingBasket, UserRound, UsersRound, type LucideIcon } from "lucide-react"
+import { Box, House, LayoutDashboard, ShoppingBasket, ShoppingCart, UserRound, UsersRound, type LucideIcon } from "lucide-react"
 import type { UserRole } from "@/types";
 
 type SidebarOption = {
@@ -26,6 +26,12 @@ export const SIDEBAR_OPTIONS: SidebarOption[] = [
         name: "Purchases",
         route: ROUTES.PURCHASES.ROOT,
         icon: ShoppingBasket,
+        roles: ["customer"],
+    },
+    {
+        name: "Cart",
+        route: ROUTES.CART,
+        icon: ShoppingCart,
         roles: ["customer"],
     },
     {

@@ -115,12 +115,7 @@ export class ProductRepository {
         FROM "Product" p
         WHERE p."embedding" IS NOT NULL
         AND p."isDeleted" = false
-        AND NOT EXISTS (
-            SELECT 1
-            FROM "Interaction" i
-            WHERE i."userId" = ${userId}
-            AND i."productId" = p."id"
-        )
+        AND EXISTS (SELECT 1 FROM interacted_products)
         ORDER BY COALESCE(
             (
                 SELECT MIN((p."embedding" <=> ip."embedding") / ip.weight)

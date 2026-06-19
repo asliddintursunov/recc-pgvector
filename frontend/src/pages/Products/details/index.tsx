@@ -16,7 +16,7 @@ import {
   useUpdateProduct,
 } from "@/hooks"
 import { formatCurrency, formatDate, formatTag } from "@/lib"
-import localstorage from "@/lib/local-storage.lib"
+import { useProfileStore } from "@/store"
 import type { Product, UpdateProductBody } from "@/types"
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
@@ -24,7 +24,8 @@ import { Link, useParams } from "react-router-dom"
 export default function ProductDetailPage() {
   const { id } = useParams()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const role = localstorage.get("authRole")
+  const { profile } = useProfileStore()
+  const role = profile?.role
   const productQuery = useProductDetails(id)
   const updateProductMutation = useUpdateProduct()
   const createInteractionMutation = useCreateInteraction()

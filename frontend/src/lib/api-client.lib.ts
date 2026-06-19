@@ -1,5 +1,5 @@
-import localstorage from './local-storage.lib';
 import { BASE_URL } from '../constants';
+import { useTokenStore } from '../store';
 export class ApiError extends Error {
     public status: number;
     public data: unknown;
@@ -67,7 +67,7 @@ function buildUrl(endpoint: string, params?: RequestOptions['params']): string {
 
 async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
     const { body, headers, params, method = 'GET', skipAuth = false, ...rest } = options;
-    const token = skipAuth ? null : localstorage.get('authToken');
+    const token = skipAuth ? null : useTokenStore.getState().accessToken;
     const requestUrl = buildUrl(url, params);
 
     const init: RequestInit = {

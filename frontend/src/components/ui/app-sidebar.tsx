@@ -12,21 +12,29 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { ROUTES, SIDEBAR_OPTIONS } from "@/constants"
-import localstorage from "@/lib/local-storage.lib"
+import { useProfileStore, useTokenStore } from "@/store"
+import { useQueryClient } from "@tanstack/react-query"
 import { LogOut } from "lucide-react"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
 
 export function AppSidebar() {
+  const queryClient = useQueryClient()
+
   const location = useLocation()
   const navigate = useNavigate()
-  const role = localstorage.get("authRole")
+  const { profile, removeProfile } = useProfileStore()
+  const { removeToken } = useTokenStore()
   const visibleSidebarOptions = SIDEBAR_OPTIONS.filter((item) => {
-    return !item.roles || (role ? item.roles.includes(role) : false)
+    return (
+      !item.roles || (profile?.role ? item.roles.includes(profile.role) : false)
+    )
   })
 
   const handleLogout = () => {
-    localstorage.remove("authToken")
-    localstorage.remove("authRole")
+    queryClient.clear()
+    removeToken()
+    removeProfile()
+
     navigate(ROUTES.AUTH, { replace: true })
   }
 

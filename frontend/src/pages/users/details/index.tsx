@@ -9,13 +9,13 @@ import { Spinner } from "@/components/ui/spinner"
 import { ROUTES } from "@/constants"
 import { useUserDetails } from "@/hooks"
 import { formatDate } from "@/lib"
-import localstorage from "@/lib/local-storage.lib"
+import { useProfileStore } from "@/store"
 import { Link, useParams } from "react-router-dom"
 
 export default function UsersDetailPage() {
   const { id } = useParams()
-  const role = localstorage.get("authRole")
-  const isAdmin = role === "admin"
+  const { profile } = useProfileStore()
+  const isAdmin = profile?.role === "admin"
   const userQuery = useUserDetails(id, isAdmin)
 
   if (!isAdmin) {
@@ -68,17 +68,21 @@ export default function UsersDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle>{user.username}</CardTitle>
-            <CardDescription className="capitalize">{user.role}</CardDescription>
+            <CardDescription className="capitalize">
+              {user.role}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <dl className="grid gap-4 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-muted-foreground">User ID</dt>
-                <dd className="mt-1 break-all font-medium">{user.id}</dd>
+                <dd className="mt-1 font-medium break-all">{user.id}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">Created</dt>
-                <dd className="mt-1 font-medium">{formatDate(user.createdAt)}</dd>
+                <dd className="mt-1 font-medium">
+                  {formatDate(user.createdAt)}
+                </dd>
               </div>
             </dl>
           </CardContent>

@@ -49,17 +49,17 @@ export default function ProfilePage() {
         <Card>
           <CardHeader>
             <CardTitle>{profile.username}</CardTitle>
-            <CardDescription className="capitalize">{profile.role}</CardDescription>
+            <CardDescription className="capitalize">
+              {profile.role}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <dl className="grid gap-4 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-muted-foreground">User ID</dt>
-                <dd className="mt-1 break-all font-medium">{profile.id}</dd>
-              </div>
-              <div>
                 <dt className="text-muted-foreground">Created</dt>
-                <dd className="mt-1 font-medium">{formatDate(profile.createdAt)}</dd>
+                <dd className="mt-1 font-medium">
+                  {formatDate(profile.createdAt)}
+                </dd>
               </div>
             </dl>
           </CardContent>

@@ -9,12 +9,13 @@ import { Spinner } from "@/components/ui/spinner"
 import { ROUTES } from "@/constants"
 import { usePurchaseDetails } from "@/hooks"
 import { formatCurrency, formatDate, formatTag } from "@/lib"
-import localstorage from "@/lib/local-storage.lib"
+import { useProfileStore } from "@/store"
 import { Link, useParams } from "react-router-dom"
 
 export default function PurchasesDetailPage() {
   const { id } = useParams()
-  const role = localstorage.get("authRole")
+  const { profile } = useProfileStore()
+  const role = profile?.role
   const canViewPurchase = role === "admin" || role === "customer"
   const purchaseQuery = usePurchaseDetails(id, canViewPurchase)
 

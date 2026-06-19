@@ -17,7 +17,7 @@ import {
 import { ROUTES } from "@/constants"
 import { useCustomers, useMerchants } from "@/hooks"
 import { formatDate } from "@/lib"
-import localstorage from "@/lib/local-storage.lib"
+import { useProfileStore } from "@/store"
 import type { UserProfile } from "@/types"
 import { Link } from "react-router-dom"
 
@@ -56,7 +56,10 @@ function UserTable({ title, users }: { title: string; users: UserProfile[] }) {
             ))}
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={4}
+                  className="text-center text-muted-foreground"
+                >
                   No users found.
                 </TableCell>
               </TableRow>
@@ -69,8 +72,8 @@ function UserTable({ title, users }: { title: string; users: UserProfile[] }) {
 }
 
 export default function UsersPage() {
-  const role = localstorage.get("authRole")
-  const isAdmin = role === "admin"
+  const { profile } = useProfileStore()
+  const isAdmin = profile?.role === "admin"
   const customersQuery = useCustomers(isAdmin)
   const merchantsQuery = useMerchants(isAdmin)
 

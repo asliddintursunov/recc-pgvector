@@ -43,7 +43,7 @@ export class AuthService {
 
         const accessToken = await this.createAccessToken(user);
 
-        return { accessToken, role: user.role };
+        return { accessToken };
 
     }
 

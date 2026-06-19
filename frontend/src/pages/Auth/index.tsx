@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { ROUTES } from "@/constants"
 import { useLoginMutation, useRegisterMutation } from "@/hooks/useSubmit"
-import localstorage from "@/lib/local-storage.lib"
+import { useTokenStore, useProfileStore } from "@/store"
 import type { AuthMode, AuthRole } from "@/types"
 import { type FormEvent, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
@@ -28,8 +28,10 @@ export default function AuthPage() {
   const loginMutation = useLoginMutation()
   const registerMutation = useRegisterMutation()
   const navigate = useNavigate()
+  const { accessToken } = useTokenStore()
+  const { profile } = useProfileStore()
 
-  if (localstorage.get("authToken") && localstorage.get("authRole")) {
+  if (accessToken && profile) {
     return <Navigate to={ROUTES.PRODUCTS.ROOT} replace />
   }
 

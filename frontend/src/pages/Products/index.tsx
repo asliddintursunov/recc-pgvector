@@ -19,8 +19,13 @@ import {
   useUpdateProduct,
 } from "@/hooks"
 import { formatCurrency, formatDate, formatTag } from "@/lib"
-import localstorage from "@/lib/local-storage.lib"
-import type { CreateProductBody, Product, UpdateProductBody, UserRole } from "@/types"
+import { useProfileStore } from "@/store"
+import type {
+  CreateProductBody,
+  Product,
+  UpdateProductBody,
+  UserRole,
+} from "@/types"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 
@@ -94,7 +99,9 @@ function ProductCard({
             <span className="text-xs text-muted-foreground">No tags</span>
           ) : null}
         </div>
-        <div className="text-lg font-semibold">{formatCurrency(product.price)}</div>
+        <div className="text-lg font-semibold">
+          {formatCurrency(product.price)}
+        </div>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2">
         <Button asChild size="sm" variant="outline">
@@ -175,7 +182,8 @@ export default function ProductsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const productsQuery = useProducts()
-  const role = localstorage.get("authRole")
+  const { profile } = useProfileStore()
+  const role = profile?.role
   const isCustomer = role === "customer"
   const isMerchant = role === "merchant"
   const recommendedQuery = useRecommendedProducts(isCustomer)

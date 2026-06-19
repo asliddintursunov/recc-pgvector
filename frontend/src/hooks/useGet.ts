@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient, ApiError } from "../lib";
 import type { Product, Purchase, UserProfile } from "../types";
 import { API_ENDPOINTS } from "../constants/api-endpoints.constant";
+import { useProfileStore } from "../store";
 
 export const useProducts = () => {
     return useQuery<Product[], ApiError>({
@@ -30,9 +31,16 @@ export const useProductDetails = (id: string | undefined, enabled = true) => {
 };
 
 export const useProfile = () => {
+    const { setProfile, profile } = useProfileStore();
+
     return useQuery<UserProfile | null, ApiError>({
         queryKey: ["users", "profile"],
-        queryFn: () => apiClient.get<UserProfile | null>(API_ENDPOINTS.USERS.PROFILE),
+        queryFn: async () => {
+            const profile = await apiClient.get<UserProfile | null>(API_ENDPOINTS.USERS.PROFILE);
+            setProfile(profile);
+            return profile;
+        },
+        initialData: () => profile,
         staleTime: 60_000,
     });
 };

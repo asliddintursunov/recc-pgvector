@@ -17,11 +17,12 @@ import {
 import { ROUTES } from "@/constants"
 import { usePurchases } from "@/hooks"
 import { formatCurrency, formatDate, formatTag } from "@/lib"
-import localstorage from "@/lib/local-storage.lib"
+import { useProfileStore } from "@/store"
 import { Link } from "react-router-dom"
 
 export default function PurchasesPage() {
-  const role = localstorage.get("authRole")
+  const { profile } = useProfileStore()
+  const role = profile?.role
   const canViewPurchases = role === "admin" || role === "customer"
   const purchasesQuery = usePurchases(canViewPurchases)
 
@@ -74,15 +75,21 @@ export default function PurchasesPage() {
                         {purchase.product.title}
                       </TableCell>
                       <TableCell>{purchase.quantity}</TableCell>
-                      <TableCell>{formatCurrency(purchase.product.price)}</TableCell>
+                      <TableCell>
+                        {formatCurrency(purchase.product.price)}
+                      </TableCell>
                       <TableCell className="capitalize">
-                        {purchase.product.tags.map(formatTag).join(", ") || "No tags"}
+                        {purchase.product.tags.map(formatTag).join(", ") ||
+                          "No tags"}
                       </TableCell>
                       <TableCell>{formatDate(purchase.createdAt)}</TableCell>
                       <TableCell className="text-right">
                         <Link
                           className="text-sm font-medium text-primary hover:underline"
-                          to={ROUTES.PURCHASES.DETAIL.replace(":id", purchase.id)}
+                          to={ROUTES.PURCHASES.DETAIL.replace(
+                            ":id",
+                            purchase.id
+                          )}
                         >
                           View
                         </Link>
@@ -91,7 +98,10 @@ export default function PurchasesPage() {
                   ))}
                   {(purchasesQuery.data ?? []).length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center text-muted-foreground"
+                      >
                         No purchases found.
                       </TableCell>
                     </TableRow>

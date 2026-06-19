@@ -11,20 +11,39 @@ import type {
     Product,
     RegisterCredentials,
     UpdateProductBody,
+    UserProfile,
 } from "../types";
 import { apiClient } from "../lib";
 import { API_ENDPOINTS } from "../constants";
-import localstorage from "../lib/local-storage.lib";
+import { useTokenStore, useProfileStore } from "../store";
 
 export const useLoginMutation = () => {
-    return useMutation<LoginResponse, ApiError, AuthCredentials>({
-        mutationFn: (credentials) =>
-            apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, credentials, {
-                skipAuth: true,
-            }),
+    const queryClient = useQueryClient();
+    const { setToken, removeToken } = useTokenStore();
+    const { setProfile, removeProfile } = useProfileStore();
+
+    return useMutation<LoginResponse & { profile: UserProfile }, ApiError, AuthCredentials>({
+        mutationFn: async (credentials) => {
+            try {
+                const data = await apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, credentials, {
+                    skipAuth: true,
+                });
+
+                setToken({ accessToken: data.accessToken });
+
+                const profile = await apiClient.get<UserProfile>(API_ENDPOINTS.USERS.PROFILE);
+                setProfile(profile);
+
+                return { ...data, profile };
+            } catch (error) {
+                queryClient.clear()
+                removeToken();
+                removeProfile();
+                throw error;
+            }
+        },
         onSuccess: (data) => {
-            localstorage.set("authToken", data.accessToken);
-            localstorage.set("authRole", data.role);
+            queryClient.setQueryData(["users", "profile"], data.profile);
         },
         onError: (error) => {
             toast.error(error.data.message);

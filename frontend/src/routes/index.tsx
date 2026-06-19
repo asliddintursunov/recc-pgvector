@@ -9,6 +9,7 @@ const AuthPage = lazy(() => import("@/pages/auth"))
 const NotFoundPage = lazy(() => import("@/pages/not-found"))
 const ProductsPage = lazy(() => import("@/pages/products"))
 const ProductDetailPage = lazy(() => import("@/pages/products/details"))
+const CartPage = lazy(() => import("@/pages/cart"))
 const UsersPage = lazy(() => import("@/pages/users"))
 const UsersDetailPage = lazy(() => import("@/pages/users/details"))
 const PurchasesPage = lazy(() => import("@/pages/purchases"))
@@ -34,6 +35,10 @@ export const routes: RouteObject[] = [
       {
         path: ROUTES.PRODUCTS.DETAIL,
         element: <ProductDetailPage />,
+      },
+      {
+        path: ROUTES.CART,
+        element: <CartPage />,
       },
       {
         path: ROUTES.USERS.ROOT,

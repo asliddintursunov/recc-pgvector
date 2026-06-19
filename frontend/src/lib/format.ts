@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export function formatCurrency(value: number) {
     return new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -6,10 +8,7 @@ export function formatCurrency(value: number) {
 }
 
 export function formatDate(value: string) {
-    return new Intl.DateTimeFormat("en-US", {
-        dateStyle: "medium",
-        timeStyle: "short",
-    }).format(new Date(value));
+    return dayjs(value).format("MMM D, YYYY, h:mm A");
 }
 
 export function formatTag(value: string) {

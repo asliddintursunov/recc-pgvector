@@ -1,4 +1,5 @@
 import { ProductDrawer } from "@/components/product-drawer"
+import CartActions from "@/components/CartActions"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,14 +12,13 @@ import { Spinner } from "@/components/ui/spinner"
 import { ROUTES } from "@/constants"
 import {
   useCreateInteraction,
-  useCreatePurchase,
   useProductDetails,
   useUpdateProduct,
 } from "@/hooks"
 import { formatCurrency, formatDate, formatTag } from "@/lib"
 import { useProfileStore } from "@/store"
-import type { Product, UpdateProductBody } from "@/types"
-import { useState } from "react"
+import type { UpdateProductBody } from "@/types"
+import { useEffect, useRef, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 
 export default function ProductDetailPage() {
@@ -28,11 +28,23 @@ export default function ProductDetailPage() {
   const role = profile?.role
   const productQuery = useProductDetails(id)
   const updateProductMutation = useUpdateProduct()
-  const createInteractionMutation = useCreateInteraction()
-  const createPurchaseMutation = useCreatePurchase()
+  const { mutate: createInteraction } = useCreateInteraction()
+  const trackedClickProductIdRef = useRef<string | null>(null)
   const isCustomer = role === "customer"
   const isMerchant = role === "merchant"
   const product = productQuery.data
+
+  useEffect(() => {
+    if (!isCustomer || !product?.id || trackedClickProductIdRef.current === product.id) {
+      return
+    }
+
+    trackedClickProductIdRef.current = product.id
+    createInteraction({
+      productId: product.id,
+      actionType: "click",
+    })
+  }, [createInteraction, isCustomer, product?.id])
 
   const handleUpdateProduct = async (values: UpdateProductBody) => {
     if (!product) {
@@ -48,22 +60,6 @@ export default function ProductDetailPage() {
     } catch {
       return
     }
-  }
-
-  const handleLike = (currentProduct: Product) => {
-    createInteractionMutation.mutate({
-      productId: currentProduct.id,
-      actionType: "like",
-    })
-  }
-
-  const handleBuy = (currentProduct: Product) => {
-    createPurchaseMutation.mutate([
-      {
-        productId: currentProduct.id,
-        quantity: 1,
-      },
-    ])
   }
 
   if (productQuery.isLoading) {
@@ -86,9 +82,6 @@ export default function ProductDetailPage() {
       </main>
     )
   }
-
-  const isActionPending =
-    createInteractionMutation.isPending || createPurchaseMutation.isPending
 
   return (
     <main className="min-h-svh p-6">
@@ -154,21 +147,7 @@ export default function ProductDetailPage() {
             </CardHeader>
             <CardContent className="grid gap-2">
               {isCustomer ? (
-                <>
-                  <Button
-                    disabled={isActionPending}
-                    onClick={() => handleBuy(product)}
-                  >
-                    Buy product
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={isActionPending}
-                    onClick={() => handleLike(product)}
-                  >
-                    Like product
-                  </Button>
-                </>
+                <CartActions product={product} size="default" />
               ) : null}
               {isMerchant ? (
                 <Button onClick={() => setDrawerOpen(true)}>

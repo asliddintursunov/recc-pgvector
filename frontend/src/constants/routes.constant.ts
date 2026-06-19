@@ -7,6 +7,8 @@ export const ROUTES = {
         DETAIL: "/products/:id",
     },
 
+    CART: "/cart",
+
     PURCHASES: {
         ROOT: "/purchases",
         DETAIL: "/purchases/:id",

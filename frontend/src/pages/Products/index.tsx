@@ -1,182 +1,17 @@
 import { ProductDrawer } from "@/components/product-drawer"
+import ProductCard from "@/components/ProductCard"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
-import { ROUTES } from "@/constants"
 import {
-  useCreateInteraction,
   useCreateProduct,
-  useCreatePurchase,
   useProducts,
   useRecommendedProducts,
   useUpdateProduct,
 } from "@/hooks"
-import { formatCurrency, formatDate, formatTag } from "@/lib"
 import { useProfileStore } from "@/store"
-import type {
-  CreateProductBody,
-  Product,
-  UpdateProductBody,
-  UserRole,
-} from "@/types"
+import type { CreateProductBody, Product, UpdateProductBody } from "@/types"
 import { useState } from "react"
-import { Link } from "react-router-dom"
-
-type ProductCardProps = {
-  product: Product
-  role?: UserRole
-  isActionPending?: boolean
-  onBuy: (product: Product) => void
-  onEdit: (product: Product) => void
-  onLike: (product: Product) => void
-}
-
-function productPath(id: string) {
-  return ROUTES.PRODUCTS.DETAIL.replace(":id", id)
-}
-
-function ProductImage({ product }: { product: Product }) {
-  return (
-    <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-muted">
-      {product.imageUrl ? (
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          className="size-full object-cover"
-        />
-      ) : (
-        <span className="px-4 text-center text-sm font-medium text-muted-foreground">
-          {product.title}
-        </span>
-      )}
-    </div>
-  )
-}
-
-function ProductCard({
-  product,
-  role,
-  isActionPending,
-  onBuy,
-  onEdit,
-  onLike,
-}: ProductCardProps) {
-  const isCustomer = role === "customer"
-  const isMerchant = role === "merchant"
-
-  return (
-    <Card className="h-full">
-      <CardHeader>
-        <ProductImage product={product} />
-        <div className="space-y-1">
-          <CardTitle>{product.title}</CardTitle>
-          <CardDescription>
-            Added {formatDate(product.createdAt)}
-          </CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="min-h-12 text-sm leading-6 text-muted-foreground">
-          {product.description || "No description provided."}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {product.tags.slice(0, 4).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-muted px-3 py-1 text-xs font-medium capitalize"
-            >
-              {formatTag(tag)}
-            </span>
-          ))}
-          {product.tags.length === 0 ? (
-            <span className="text-xs text-muted-foreground">No tags</span>
-          ) : null}
-        </div>
-        <div className="text-lg font-semibold">
-          {formatCurrency(product.price)}
-        </div>
-      </CardContent>
-      <CardFooter className="flex flex-wrap gap-2">
-        <Button asChild size="sm" variant="outline">
-          <Link to={productPath(product.id)}>Details</Link>
-        </Button>
-        {isCustomer ? (
-          <>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={isActionPending}
-              onClick={() => onLike(product)}
-            >
-              Like
-            </Button>
-            <Button
-              size="sm"
-              disabled={isActionPending}
-              onClick={() => onBuy(product)}
-            >
-              Buy
-            </Button>
-          </>
-        ) : null}
-        {isMerchant ? (
-          <Button size="sm" onClick={() => onEdit(product)}>
-            Edit
-          </Button>
-        ) : null}
-      </CardFooter>
-    </Card>
-  )
-}
-
-function ProductGrid({
-  products,
-  role,
-  isActionPending,
-  onBuy,
-  onEdit,
-  onLike,
-}: {
-  products: Product[]
-  role?: UserRole
-  isActionPending?: boolean
-  onBuy: (product: Product) => void
-  onEdit: (product: Product) => void
-  onLike: (product: Product) => void
-}) {
-  if (products.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-10 text-center text-muted-foreground">
-          No products found.
-        </CardContent>
-      </Card>
-    )
-  }
-
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          role={role ?? undefined}
-          isActionPending={isActionPending}
-          onBuy={onBuy}
-          onEdit={onEdit}
-          onLike={onLike}
-        />
-      ))}
-    </div>
-  )
-}
 
 export default function ProductsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -189,13 +24,9 @@ export default function ProductsPage() {
   const recommendedQuery = useRecommendedProducts(isCustomer)
   const createProductMutation = useCreateProduct()
   const updateProductMutation = useUpdateProduct()
-  const createInteractionMutation = useCreateInteraction()
-  const createPurchaseMutation = useCreatePurchase()
 
   const isDrawerSubmitting =
     createProductMutation.isPending || updateProductMutation.isPending
-  const isActionPending =
-    createInteractionMutation.isPending || createPurchaseMutation.isPending
 
   const openCreateDrawer = () => {
     setEditingProduct(null)
@@ -232,22 +63,6 @@ export default function ProductsPage() {
     } catch {
       return
     }
-  }
-
-  const handleLike = (product: Product) => {
-    createInteractionMutation.mutate({
-      productId: product.id,
-      actionType: "like",
-    })
-  }
-
-  const handleBuy = (product: Product) => {
-    createPurchaseMutation.mutate([
-      {
-        productId: product.id,
-        quantity: 1,
-      },
-    ])
   }
 
   if (productsQuery.isLoading) {
@@ -288,14 +103,16 @@ export default function ProductsPage() {
                 </CardContent>
               </Card>
             ) : (
-              <ProductGrid
-                products={recommendedQuery.data ?? []}
-                role={role ?? undefined}
-                isActionPending={isActionPending}
-                onBuy={handleBuy}
-                onEdit={openEditDrawer}
-                onLike={handleLike}
-              />
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {recommendedQuery.data?.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    role={role ?? undefined}
+                    onEdit={openEditDrawer}
+                  />
+                ))}
+              </div>
             )}
           </section>
         ) : null}
@@ -309,14 +126,16 @@ export default function ProductsPage() {
                 : "Available product catalog."}
             </p>
           </div>
-          <ProductGrid
-            products={productsQuery.data ?? []}
-            role={role ?? undefined}
-            isActionPending={isActionPending}
-            onBuy={handleBuy}
-            onEdit={openEditDrawer}
-            onLike={handleLike}
-          />
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {productsQuery.data?.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                role={role ?? undefined}
+                onEdit={openEditDrawer}
+              />
+            ))}
+          </div>
         </section>
       </section>
       <ProductDrawer

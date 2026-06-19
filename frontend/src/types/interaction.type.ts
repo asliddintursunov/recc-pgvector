@@ -1,1 +1,1 @@
-export type InteractionType = "search" | "click" | "like";
+export type InteractionType = "search" | "click" | "purchase";

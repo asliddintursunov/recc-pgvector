@@ -91,7 +91,7 @@ export class ProductRepository {
             SELECT
                 p."embedding",
                 CASE i."actionType"
-                    WHEN 'like' THEN 3.0
+                    WHEN 'purchase' THEN 3.0
                     WHEN 'click' THEN 2.0
                     WHEN 'search' THEN 1.0
                 END AS weight

@@ -90,5 +90,5 @@ model Interaction {
 enum INTERACTION_TYPE {
   search
   click
-  like
+  purchase
 }

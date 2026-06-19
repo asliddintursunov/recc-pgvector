@@ -1,0 +1,1 @@
+ALTER TYPE "INTERACTION_TYPE" RENAME VALUE 'like' TO 'purchase';

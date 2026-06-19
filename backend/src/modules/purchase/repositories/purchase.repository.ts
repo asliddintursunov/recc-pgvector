@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/modules/prisma/services/prisma.service";
 import { CreatePurchaseNormalizedArgs, GetPurchaseArgs, GetPurchaseDetailsArgs } from "../interfaces";
-import { USER_ROLE } from "@prisma/client";
+import { INTERACTION_TYPE, USER_ROLE } from "@prisma/client";
 
 @Injectable()
 export class PurchaseRepository {
@@ -55,9 +55,20 @@ export class PurchaseRepository {
     }
 
     async create(data: CreatePurchaseNormalizedArgs[]) {
-        const history = await this.prismaService.purchaseHistory.createMany({
-            data
-        })
-        return history;
+        return await this.prismaService.$transaction(async (tx) => {
+            const history = await tx.purchaseHistory.createMany({
+                data
+            })
+
+            await tx.interaction.createMany({
+                data: data.map((purchase) => ({
+                    userId: purchase.userId,
+                    productId: purchase.productId,
+                    actionType: INTERACTION_TYPE.purchase,
+                }))
+            })
+
+            return history;
+        });
     }
 }

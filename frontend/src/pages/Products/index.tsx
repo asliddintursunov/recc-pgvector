@@ -2,11 +2,7 @@ import { ProductDrawer } from "@/components/product-drawer"
 import ProductCard from "@/components/ProductCard"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import {
-  useCreateProduct,
-  useProducts,
-  useUpdateProduct,
-} from "@/hooks"
+import { useCreateProduct, useProducts, useUpdateProduct } from "@/hooks"
 import { useProfileStore } from "@/store"
 import type { CreateProductBody, Product, UpdateProductBody } from "@/types"
 import { useState } from "react"
@@ -14,15 +10,14 @@ import { useState } from "react"
 export default function ProductsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const productsQuery = useProducts()
+  const { data, isLoading } = useProducts()
   const { profile } = useProfileStore()
   const role = profile?.role
   const isMerchant = role === "merchant"
-  const createProductMutation = useCreateProduct()
-  const updateProductMutation = useUpdateProduct()
-
-  const isDrawerSubmitting =
-    createProductMutation.isPending || updateProductMutation.isPending
+  const { mutateAsync: createProduct, isPending: isCreateProductPending } =
+    useCreateProduct()
+  const { mutateAsync: updateProduct, isPending: isUpdateProductPending } =
+    useUpdateProduct()
 
   const openCreateDrawer = () => {
     setEditingProduct(null)
@@ -47,12 +42,12 @@ export default function ProductsPage() {
   ) => {
     try {
       if (editingProduct) {
-        await updateProductMutation.mutateAsync({
+        await updateProduct({
           id: editingProduct.id,
           body: values,
         })
       } else {
-        await createProductMutation.mutateAsync(values as CreateProductBody)
+        await createProduct(values as CreateProductBody)
       }
 
       handleDrawerOpenChange(false)
@@ -61,7 +56,7 @@ export default function ProductsPage() {
     }
   }
 
-  if (productsQuery.isLoading) {
+  if (isLoading) {
     return (
       <main className="flex min-h-[calc(100svh-3.5rem)] items-center justify-center p-6">
         <Spinner className="size-6" />
@@ -94,7 +89,7 @@ export default function ProductsPage() {
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {productsQuery.data?.map((product) => (
+            {data?.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -108,7 +103,7 @@ export default function ProductsPage() {
       <ProductDrawer
         open={drawerOpen}
         product={editingProduct}
-        isSubmitting={isDrawerSubmitting}
+        isSubmitting={isCreateProductPending || isUpdateProductPending}
         onOpenChange={handleDrawerOpenChange}
         onSubmit={handleProductSubmit}
       />

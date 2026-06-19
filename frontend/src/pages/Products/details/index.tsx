@@ -26,16 +26,20 @@ export default function ProductDetailPage() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { profile } = useProfileStore()
   const role = profile?.role
-  const productQuery = useProductDetails(id)
-  const updateProductMutation = useUpdateProduct()
-  const { mutate: createInteraction } = useCreateInteraction()
+  const { data: product, isLoading: isProductLoading } = useProductDetails(id)
+  const { mutateAsync: updateProduct } = useUpdateProduct()
+  const { mutate: createInteraction, isPending: isCreateInteractionPending } =
+    useCreateInteraction()
   const trackedClickProductIdRef = useRef<string | null>(null)
   const isCustomer = role === "customer"
   const isMerchant = role === "merchant"
-  const product = productQuery.data
 
   useEffect(() => {
-    if (!isCustomer || !product?.id || trackedClickProductIdRef.current === product.id) {
+    if (
+      !isCustomer ||
+      !product?.id ||
+      trackedClickProductIdRef.current === product.id
+    ) {
       return
     }
 
@@ -52,7 +56,7 @@ export default function ProductDetailPage() {
     }
 
     try {
-      await updateProductMutation.mutateAsync({
+      await updateProduct({
         id: product.id,
         body: values,
       })
@@ -62,7 +66,7 @@ export default function ProductDetailPage() {
     }
   }
 
-  if (productQuery.isLoading) {
+  if (isProductLoading) {
     return (
       <main className="flex min-h-[calc(100svh-3.5rem)] items-center justify-center p-6">
         <Spinner className="size-6" />
@@ -166,7 +170,7 @@ export default function ProductDetailPage() {
       <ProductDrawer
         open={drawerOpen}
         product={product}
-        isSubmitting={updateProductMutation.isPending}
+        isSubmitting={isCreateInteractionPending}
         onOpenChange={setDrawerOpen}
         onSubmit={handleUpdateProduct}
       />

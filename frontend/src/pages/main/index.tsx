@@ -7,7 +7,7 @@ import { useProfileStore } from "@/store"
 export default function MainPage() {
   const { profile } = useProfileStore()
   const isCustomer = profile?.role === "customer"
-  const recommendedQuery = useRecommendedProducts(isCustomer)
+  const { data, isLoading } = useRecommendedProducts(isCustomer)
 
   return (
     <main className="min-h-svh p-6">
@@ -33,15 +33,15 @@ export default function MainPage() {
                 Recommended products are available to customer accounts.
               </CardContent>
             </Card>
-          ) : recommendedQuery.isLoading ? (
+          ) : isLoading ? (
             <Card>
               <CardContent className="flex items-center justify-center py-10">
                 <Spinner className="size-6" />
               </CardContent>
             </Card>
-          ) : (recommendedQuery.data ?? []).length > 0 ? (
+          ) : (data ?? []).length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {recommendedQuery.data?.map((product) => (
+              {data?.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}

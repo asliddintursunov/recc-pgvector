@@ -79,8 +79,10 @@ export default function UsersPage() {
   const [activeTab, setActiveTab] = useState<UsersTab>("customers")
   const { profile } = useProfileStore()
   const isAdmin = profile?.role === "admin"
-  const customersQuery = useCustomers(isAdmin)
-  const merchantsQuery = useMerchants(isAdmin)
+  const { data: customers, isLoading: areCustomersLoading } =
+    useCustomers(isAdmin)
+  const { data: merchants, isLoading: areMerchantsLoading } =
+    useMerchants(isAdmin)
 
   if (!isAdmin) {
     return (
@@ -97,11 +99,8 @@ export default function UsersPage() {
     )
   }
 
-  const isLoading = customersQuery.isLoading || merchantsQuery.isLoading
   const activeUsers =
-    activeTab === "customers"
-      ? (customersQuery.data ?? [])
-      : (merchantsQuery.data ?? [])
+    activeTab === "customers" ? (customers ?? []) : (merchants ?? [])
   const activeTitle = activeTab === "customers" ? "Customers" : "Merchants"
 
   return (
@@ -129,7 +128,7 @@ export default function UsersPage() {
             Merchants
           </Button>
         </div>
-        {isLoading ? (
+        {areCustomersLoading || areMerchantsLoading ? (
           <Card>
             <CardContent className="flex items-center justify-center py-10">
               <Spinner className="size-6" />

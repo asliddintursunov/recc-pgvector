@@ -10,9 +10,13 @@ import { useProfile } from "@/hooks"
 import { formatDate } from "@/lib"
 
 export default function ProfilePage() {
-  const profileQuery = useProfile()
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useProfile()
 
-  if (profileQuery.isLoading) {
+  if (isProfileLoading) {
     return (
       <main className="flex min-h-[calc(100svh-3.5rem)] items-center justify-center p-6">
         <Spinner className="size-6" />
@@ -20,7 +24,7 @@ export default function ProfilePage() {
     )
   }
 
-  if (profileQuery.error || !profileQuery.data) {
+  if (profileError || !profile) {
     return (
       <main className="p-6">
         <Card>
@@ -34,8 +38,6 @@ export default function ProfilePage() {
       </main>
     )
   }
-
-  const profile = profileQuery.data
 
   return (
     <main className="min-h-svh p-6">

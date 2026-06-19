@@ -47,7 +47,6 @@ export default function UsersDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle>User not found</CardTitle>
-            <CardDescription>No user exists for ID {id}.</CardDescription>
           </CardHeader>
         </Card>
       </main>
@@ -74,10 +73,6 @@ export default function UsersDetailPage() {
           </CardHeader>
           <CardContent>
             <dl className="grid gap-4 text-sm sm:grid-cols-2">
-              <div>
-                <dt className="text-muted-foreground">User ID</dt>
-                <dd className="mt-1 font-medium break-all">{user.id}</dd>
-              </div>
               <div>
                 <dt className="text-muted-foreground">Created</dt>
                 <dd className="mt-1 font-medium">

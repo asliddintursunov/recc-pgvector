@@ -25,8 +25,9 @@ export default function AuthPage() {
   const [role, setRole] = useState<AuthRole>("customer")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const loginMutation = useLoginMutation()
-  const registerMutation = useRegisterMutation()
+  const { mutateAsync: login, isPending: isLoginPending } = useLoginMutation()
+  const { mutateAsync: register, isPending: isRegisterPending } =
+    useRegisterMutation()
   const navigate = useNavigate()
   const { accessToken } = useTokenStore()
   const { profile } = useProfileStore()
@@ -36,7 +37,7 @@ export default function AuthPage() {
   }
 
   const isLogin = mode === "login"
-  const isSubmitting = loginMutation.isPending || registerMutation.isPending
+  const isSubmitting = isLoginPending || isRegisterPending
 
   const handleModeChange = (nextMode: AuthMode) => {
     setMode(nextMode)
@@ -55,12 +56,12 @@ export default function AuthPage() {
     }
 
     if (isLogin) {
-      const data = await loginMutation.mutateAsync(credentials)
+      const data = await login(credentials)
       navigate(getDefaultRoute(data.profile.role), { replace: true })
       return
     }
 
-    await registerMutation.mutateAsync({ ...credentials, role })
+    await register({ ...credentials, role })
     setMode("login")
     setRole("customer")
     setPassword("")

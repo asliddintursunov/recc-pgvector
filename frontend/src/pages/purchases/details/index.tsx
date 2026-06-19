@@ -17,7 +17,10 @@ export default function PurchasesDetailPage() {
   const { profile } = useProfileStore()
   const role = profile?.role
   const canViewPurchase = role === "admin" || role === "customer"
-  const purchaseQuery = usePurchaseDetails(id, canViewPurchase)
+  const { data: purchase, isLoading: isPurchaseLoading } = usePurchaseDetails(
+    id,
+    canViewPurchase
+  )
 
   if (!canViewPurchase) {
     return (
@@ -34,7 +37,7 @@ export default function PurchasesDetailPage() {
     )
   }
 
-  if (purchaseQuery.isLoading) {
+  if (isPurchaseLoading) {
     return (
       <main className="flex min-h-[calc(100svh-3.5rem)] items-center justify-center p-6">
         <Spinner className="size-6" />
@@ -42,7 +45,7 @@ export default function PurchasesDetailPage() {
     )
   }
 
-  if (!purchaseQuery.data) {
+  if (!purchase) {
     return (
       <main className="p-6">
         <Card>
@@ -54,8 +57,6 @@ export default function PurchasesDetailPage() {
       </main>
     )
   }
-
-  const purchase = purchaseQuery.data
 
   return (
     <main className="min-h-svh p-6">

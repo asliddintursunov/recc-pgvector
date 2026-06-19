@@ -24,7 +24,8 @@ export default function PurchasesPage() {
   const { profile } = useProfileStore()
   const role = profile?.role
   const canViewPurchases = role === "admin" || role === "customer"
-  const purchasesQuery = usePurchases(canViewPurchases)
+  const { data: purchases, isLoading: isPurchasesLoading } =
+    usePurchases(canViewPurchases)
 
   if (!canViewPurchases) {
     return (
@@ -52,7 +53,7 @@ export default function PurchasesPage() {
         </div>
         <Card>
           <CardContent className="pt-6">
-            {purchasesQuery.isLoading ? (
+            {isPurchasesLoading ? (
               <div className="flex items-center justify-center py-10">
                 <Spinner className="size-6" />
               </div>
@@ -69,7 +70,7 @@ export default function PurchasesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(purchasesQuery.data ?? []).map((purchase) => (
+                  {(purchases ?? []).map((purchase) => (
                     <TableRow key={purchase.id}>
                       <TableCell className="font-medium">
                         {purchase.product.title}
@@ -96,7 +97,7 @@ export default function PurchasesPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {(purchasesQuery.data ?? []).length === 0 ? (
+                  {(purchases ?? []).length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}

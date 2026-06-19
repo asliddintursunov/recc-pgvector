@@ -1,13 +1,13 @@
-import CartActions from "@/components/CartActions";
-import ProductImage from "@/components/ProductImage";
-import { Button } from "@/components/ui/button";
+import CartActions from "@/components/CartActions"
+import ProductImage from "@/components/ProductImage"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -15,16 +15,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { ROUTES } from "@/constants";
-import { useCreatePurchase } from "@/hooks";
-import { formatCurrency } from "@/lib";
-import { useProductsStore, useProfileStore } from "@/store";
-import { Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+} from "@/components/ui/table"
+import { ROUTES } from "@/constants"
+import { useCreatePurchase } from "@/hooks"
+import { formatCurrency } from "@/lib"
+import { useProductsStore, useProfileStore } from "@/store"
+import { Trash2 } from "lucide-react"
+import { Link } from "react-router-dom"
 
 export default function CartPage() {
-  const { profile } = useProfileStore();
+  const { profile } = useProfileStore()
   const {
     cart,
     selectedProductIds,
@@ -33,42 +33,43 @@ export default function CartPage() {
     clearSelectedProducts,
     removeProduct,
     clearCart,
-  } = useProductsStore();
-  const createPurchaseMutation = useCreatePurchase();
-  const isCustomer = profile?.role === "customer";
+  } = useProductsStore()
+  const { mutateAsync: createPurchase, isPending: isCreatePurchasePending } =
+    useCreatePurchase()
+  const isCustomer = profile?.role === "customer"
 
   const selectedCartItems = cart.filter((item) =>
-    selectedProductIds.includes(item.product.id),
-  );
+    selectedProductIds.includes(item.product.id)
+  )
   const isAllSelected =
-    cart.length > 0 && selectedProductIds.length === cart.length;
+    cart.length > 0 && selectedProductIds.length === cart.length
   const selectedTotal = selectedCartItems.reduce(
     (total, item) => total + item.product.price * item.quantity,
-    0,
-  );
+    0
+  )
 
   const handleSelectAllChange = () => {
     if (isAllSelected) {
-      clearSelectedProducts();
-      return;
+      clearSelectedProducts()
+      return
     }
 
-    selectAllProducts();
-  };
+    selectAllProducts()
+  }
 
   const handleCheckout = async () => {
     if (selectedCartItems.length === 0) {
-      return;
+      return
     }
 
-    await createPurchaseMutation.mutateAsync(
+    await createPurchase(
       selectedCartItems.map((item) => ({
         productId: item.product.id,
         quantity: item.quantity,
-      })),
-    );
-    clearCart();
-  };
+      }))
+    )
+    clearCart()
+  }
 
   if (!isCustomer) {
     return (
@@ -84,7 +85,7 @@ export default function CartPage() {
           </Card>
         </section>
       </main>
-    );
+    )
   }
 
   if (cart.length === 0) {
@@ -104,7 +105,7 @@ export default function CartPage() {
           </Card>
         </section>
       </main>
-    );
+    )
   }
 
   return (
@@ -123,11 +124,11 @@ export default function CartPage() {
             </Button>
             <Button
               disabled={
-                selectedCartItems.length === 0 || createPurchaseMutation.isPending
+                selectedCartItems.length === 0 || isCreatePurchasePending
               }
               onClick={handleCheckout}
             >
-              {createPurchaseMutation.isPending
+              {isCreatePurchasePending
                 ? "Submitting..."
                 : `Checkout ${formatCurrency(selectedTotal)}`}
             </Button>
@@ -157,7 +158,9 @@ export default function CartPage() {
               </TableHeader>
               <TableBody>
                 {cart.map((item) => {
-                  const isSelected = selectedProductIds.includes(item.product.id);
+                  const isSelected = selectedProductIds.includes(
+                    item.product.id
+                  )
 
                   return (
                     <TableRow key={item.product.id}>
@@ -166,7 +169,9 @@ export default function CartPage() {
                           type="checkbox"
                           aria-label={`Select ${item.product.title}`}
                           checked={isSelected}
-                          onChange={() => toggleSelectedProduct(item.product.id)}
+                          onChange={() =>
+                            toggleSelectedProduct(item.product.id)
+                          }
                           className="size-4 accent-primary"
                         />
                       </TableCell>
@@ -180,18 +185,21 @@ export default function CartPage() {
                               className="font-medium hover:underline"
                               to={ROUTES.PRODUCTS.DETAIL.replace(
                                 ":id",
-                                item.product.id,
+                                item.product.id
                               )}
                             >
                               {item.product.title}
                             </Link>
                             <p className="line-clamp-1 text-sm text-muted-foreground">
-                              {item.product.description || "No description provided."}
+                              {item.product.description ||
+                                "No description provided."}
                             </p>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{formatCurrency(item.product.price)}</TableCell>
+                      <TableCell>
+                        {formatCurrency(item.product.price)}
+                      </TableCell>
                       <TableCell>
                         <CartActions product={item.product} size="sm" />
                       </TableCell>
@@ -209,7 +217,7 @@ export default function CartPage() {
                         </Button>
                       </TableCell>
                     </TableRow>
-                  );
+                  )
                 })}
               </TableBody>
             </Table>
@@ -217,5 +225,5 @@ export default function CartPage() {
         </Card>
       </section>
     </main>
-  );
+  )
 }

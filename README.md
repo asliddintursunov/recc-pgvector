@@ -1,21 +1,26 @@
 # Recommendation System
 
-A small full-stack recommendation marketplace. The backend is a NestJS API with
-PostgreSQL, Prisma, and pgvector. The frontend is a React + Vite app for signing
-in, browsing products, creating/updating products, and collecting interactions
-for recommendations.
+A small full-stack marketplace with role-based access, product management, carts,
+purchases, and product recommendations based on customer interactions.
+
+## Stack
+
+- Backend: NestJS, Prisma, PostgreSQL, pgvector, JWT auth
+- Frontend: React, Vite, React Router, TanStack Query, Zustand, Tailwind CSS
+- Embeddings: Gemini API
 
 ## Project Structure
 
 ```text
-backend/   NestJS API, Prisma schema, migrations, seed data
-frontend/  React + Vite app
+backend/   NestJS API, Prisma schema, migrations, seed script
+frontend/  React + Vite client
 ```
 
 ## Requirements
 
 - Node.js and npm
-- PostgreSQL with the pgvector extension available
+- PostgreSQL
+- pgvector extension enabled in PostgreSQL
 - Gemini API key for product embeddings
 
 ## Backend Setup
@@ -25,13 +30,12 @@ cd backend
 npm install
 cp .env.example .env
 npm run prisma:migrate
-npm run prisma:seed
 npm run start:dev
 ```
 
-The backend runs on `http://localhost:8000` by default.
+Backend runs on `http://localhost:8000` by default.
 
-Set these values in `backend/.env`:
+Important `backend/.env` values:
 
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/DATABASE"
@@ -42,8 +46,20 @@ PORT=8000
 FRONTEND_URL=http://localhost:3000
 ```
 
-The seed command creates sample products, interactions, and users. Seeded users
-use `password123` as the password.
+Seed sample merchant products:
+
+```bash
+npm run prisma:seed
+```
+
+The seed creates one merchant account:
+
+```text
+username: seed_merchant
+password: password123
+```
+
+It also creates 30 products for that merchant with sample embeddings.
 
 ## Frontend Setup
 
@@ -54,93 +70,74 @@ cp .env.example .env
 npm run dev
 ```
 
-The frontend runs on `http://localhost:3000` by default.
+Frontend runs on `http://localhost:3000` by default.
 
-Set the API URL in `frontend/.env`:
+Important `frontend/.env` value:
 
 ```env
 VITE_BASE_URL=http://localhost:8000
 ```
 
-## Backend Endpoints
+## Roles
 
-All endpoints except auth require an `Authorization: Bearer <token>` header.
+- Customer: Main, Products, Purchases, Cart, Profile
+- Merchant: Products, Profile
+- Admin: Dashboard, Users, Profile
 
-### Auth
+## Main Features
 
-| Method | Path | Description |
-| --- | --- | --- |
-| `POST` | `/auth/register` | Create a user with `username` and `password`. |
-| `POST` | `/auth/login` | Log in and return an access token. |
+- Register/login as customer or merchant
+- Login stores the access token and profile in persisted Zustand state
+- Customers can view recommendations, browse products, add products to cart,
+  and submit purchases
+- Merchants can create and update their own products
+- Admins can view users by Customers and Merchants tabs
+- Product details send a `click` interaction
+- Purchases create `purchase` interactions
+- Recommendations use product embeddings and interaction weights:
+  `purchase = 3.0`, `click = 2.0`, `search = 1.0`
 
-Example auth body:
+## API Summary
 
-```json
-{
-  "username": "alice",
-  "password": "password123"
-}
-```
+Auth:
 
-### Products
+- `POST /auth/register/customer`
+- `POST /auth/register/merchant`
+- `POST /auth/login`
 
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/products` | List all products. |
-| `GET` | `/products/recommended` | List up to 10 recommended products for the current user. |
-| `GET` | `/products/:id` | Get one product by ID. |
-| `POST` | `/products` | Create a product and generate its embedding. |
-| `PATCH` | `/products/:id` | Update a product. |
-| `POST` | `/products/:id/interaction` | Save a `search`, `click`, or `like` interaction. |
+Products:
 
-Example product body:
+- `GET /products`
+- `GET /products/recommended`
+- `GET /products/:id`
+- `POST /products` merchant only
+- `PATCH /products/:id` merchant only
+- `POST /products/:id/interaction` customer only
 
-```json
-{
-  "title": "Wireless headphones",
-  "description": "Noise-canceling headphones for travel.",
-  "tags": ["new", "audio", "wireless"]
-}
-```
+Purchases:
 
-Available product tags:
+- `GET /purchases`
+- `GET /purchases/:id`
+- `POST /purchases` customer only
 
-```text
-new, used, gaming, electronics, audio, wireless, laptop, smartphone,
-home_appliance, furniture, fitness, books
-```
+Users:
 
-Example interaction body:
-
-```json
-{
-  "actionType": "like"
-}
-```
-
-Recommendations use pgvector similarity against products the user has already
-interacted with. Likes are weighted more strongly than clicks and searches.
-
-## Frontend Features
-
-- Login and registration
-- Protected product pages
-- Product list and product detail pages
-- Recommended products section
-- Create and edit product modal
-- Product tags
-- Like and click tracking for recommendations
-- Toast messages for success and error states
-- Sign out
+- `GET /users/profile`
+- `GET /users/customers` admin only
+- `GET /users/merchants` admin only
+- `GET /users/:id` admin only
 
 ## Useful Commands
 
 Backend:
 
 ```bash
+npm run build
 npm run start:dev
+npm run prisma:generate
 npm run prisma:migrate
 npm run prisma:deploy
+npm run prisma:reset
 npm run prisma:seed
 npm run prisma:studio
 ```
@@ -150,5 +147,8 @@ Frontend:
 ```bash
 npm run dev
 npm run build
+npm run lint
+npm run format
+npm run typecheck
 npm run preview
 ```

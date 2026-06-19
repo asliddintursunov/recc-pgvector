@@ -13,8 +13,8 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { ROUTES } from "@/constants"
 import { useLoginMutation, useRegisterMutation } from "@/hooks/useSubmit"
+import { getDefaultRoute } from "@/lib"
 import { useTokenStore, useProfileStore } from "@/store"
 import type { AuthMode, AuthRole } from "@/types"
 import { type FormEvent, useState } from "react"
@@ -32,7 +32,7 @@ export default function AuthPage() {
   const { profile } = useProfileStore()
 
   if (accessToken && profile) {
-    return <Navigate to={ROUTES.PRODUCTS.ROOT} replace />
+    return <Navigate to={getDefaultRoute(profile.role)} replace />
   }
 
   const isLogin = mode === "login"
@@ -55,8 +55,8 @@ export default function AuthPage() {
     }
 
     if (isLogin) {
-      await loginMutation.mutateAsync(credentials)
-      navigate(ROUTES.PRODUCTS.ROOT, { replace: true })
+      const data = await loginMutation.mutateAsync(credentials)
+      navigate(getDefaultRoute(data.profile.role), { replace: true })
       return
     }
 

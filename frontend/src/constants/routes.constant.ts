@@ -1,6 +1,8 @@
 export const ROUTES = {
     ROOT: "/",
     AUTH: "/auth",
+    MAIN: "/main",
+    DASHBOARD: "/dashboard",
 
     PRODUCTS: {
         ROOT: "/products",

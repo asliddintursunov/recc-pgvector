@@ -1,12 +1,10 @@
 import { ProductDrawer } from "@/components/product-drawer"
 import ProductCard from "@/components/ProductCard"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 import {
   useCreateProduct,
   useProducts,
-  useRecommendedProducts,
   useUpdateProduct,
 } from "@/hooks"
 import { useProfileStore } from "@/store"
@@ -19,9 +17,7 @@ export default function ProductsPage() {
   const productsQuery = useProducts()
   const { profile } = useProfileStore()
   const role = profile?.role
-  const isCustomer = role === "customer"
   const isMerchant = role === "merchant"
-  const recommendedQuery = useRecommendedProducts(isCustomer)
   const createProductMutation = useCreateProduct()
   const updateProductMutation = useUpdateProduct()
 
@@ -87,35 +83,6 @@ export default function ProductsPage() {
             <Button onClick={openCreateDrawer}>Create product</Button>
           ) : null}
         </div>
-
-        {isCustomer ? (
-          <section className="space-y-4">
-            <div>
-              <h2 className="text-lg font-semibold">Recommended</h2>
-              <p className="text-sm text-muted-foreground">
-                Products suggested from your interactions.
-              </p>
-            </div>
-            {recommendedQuery.isLoading ? (
-              <Card>
-                <CardContent className="flex items-center justify-center py-10">
-                  <Spinner className="size-6" />
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {recommendedQuery.data?.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    role={role ?? undefined}
-                    onEdit={openEditDrawer}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
-        ) : null}
 
         <section className="space-y-4">
           <div>

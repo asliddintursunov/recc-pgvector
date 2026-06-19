@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import {
   Table,
@@ -19,7 +20,10 @@ import { useCustomers, useMerchants } from "@/hooks"
 import { formatDate } from "@/lib"
 import { useProfileStore } from "@/store"
 import type { UserProfile } from "@/types"
+import { useState } from "react"
 import { Link } from "react-router-dom"
+
+type UsersTab = "customers" | "merchants"
 
 function UserTable({ title, users }: { title: string; users: UserProfile[] }) {
   return (
@@ -72,6 +76,7 @@ function UserTable({ title, users }: { title: string; users: UserProfile[] }) {
 }
 
 export default function UsersPage() {
+  const [activeTab, setActiveTab] = useState<UsersTab>("customers")
   const { profile } = useProfileStore()
   const isAdmin = profile?.role === "admin"
   const customersQuery = useCustomers(isAdmin)
@@ -93,6 +98,11 @@ export default function UsersPage() {
   }
 
   const isLoading = customersQuery.isLoading || merchantsQuery.isLoading
+  const activeUsers =
+    activeTab === "customers"
+      ? (customersQuery.data ?? [])
+      : (merchantsQuery.data ?? [])
+  const activeTitle = activeTab === "customers" ? "Customers" : "Merchants"
 
   return (
     <main className="min-h-svh p-6">
@@ -103,6 +113,22 @@ export default function UsersPage() {
             Customer and merchant accounts.
           </p>
         </div>
+        <div className="flex w-fit rounded-md border bg-background p-1">
+          <Button
+            size="sm"
+            variant={activeTab === "customers" ? "default" : "ghost"}
+            onClick={() => setActiveTab("customers")}
+          >
+            Customers
+          </Button>
+          <Button
+            size="sm"
+            variant={activeTab === "merchants" ? "default" : "ghost"}
+            onClick={() => setActiveTab("merchants")}
+          >
+            Merchants
+          </Button>
+        </div>
         {isLoading ? (
           <Card>
             <CardContent className="flex items-center justify-center py-10">
@@ -110,10 +136,7 @@ export default function UsersPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 xl:grid-cols-2">
-            <UserTable title="Customers" users={customersQuery.data ?? []} />
-            <UserTable title="Merchants" users={merchantsQuery.data ?? []} />
-          </div>
+          <UserTable title={activeTitle} users={activeUsers} />
         )}
       </section>
     </main>
